@@ -1,128 +1,122 @@
 import { NextResponse } from 'next/server';
+import Anthropic from '@anthropic-ai/sdk';
+
+const client = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
+
+export const maxDuration = 60;
 
 export async function POST(request) {
-  const { brand1, brand2, trimester } = await request.json();
+  const { brands, period } = await request.json();
 
-  if (!brand1 || !brand2 || !trimester) {
-    return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
+  if (!brands || brands.length < 2) {
+    return NextResponse.json({ error: 'Min 2 brands required' }, { status: 400 });
   }
 
   try {
-    const [data1, data2] = await Promise.all([
-      analyzeBrand(brand1, trimester),
-      analyzeBrand(brand2, trimester),
-    ]);
+    const brandPromises = brands.map(brand => analyzeBrand(brand, period));
+    const results = await Promise.allSettled(brandPromises);
 
-    return NextResponse.json({
-      brand1, brand2, trimester, data1, data2
-    });
+    const reportData = {
+      period,
+      brands: brands.reduce((acc, brand, idx) => {
+        const result = results[idx];
+        if (result.status === 'fulfilled') {
+          acc[brand] = result.value;
+        } else {
+          acc[brand] = { error: result.reason?.message || 'Analisi non disponibile' };
+        }
+        return acc;
+      }, {})
+    };
+
+    return NextResponse.json(reportData);
   } catch (error) {
     console.error('Error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
-async function analyzeBrand(brand, trimester) {
-  const Anthropic = require("@anthropic-ai/sdk").default;
-  const client = new Anthropic({
-    apiKey: process.env.ANTHROPIC_API_KEY,
-  });
+async function analyzeBrand(brand, period) {
+  const userPrompt = `Fornisci un'analisi completa di ${brand} nel mercato italiano durante ${period}.
 
-  const systemPrompt = `You are a market intelligence analyst for Italian financial services.
-CRITICAL: Use web_search to find REAL data about ${brand}.
-Search Italian media (advisoronline.it, milanofinanza.it, etc), events, social media.
-Return ONLY valid JSON, no markdown.`;
+Ricerca online e fornisci:
+1. Tutti gli eventi organizzati o sponsorizzati
+2. Partecipazioni a eventi di settore
+3. Awards e riconoscimenti ricevuti
+4. Copertura mediatica italiana
+5. Positioning e narrative ufficiale
 
-  const userPrompt = `Find REAL data about ${brand} in Italy for ${trimester} 2026.
-
-SEARCH these queries with web_search tool:
-- "${brand} roadshow 2026"
-- "${brand} evento 2026 milano finanza"
-- "${brand} Salone del Risparmio 2026"
-- "${brand} AIPB 2026"
-- "${brand} award finanza 2026"
-- "${brand} milanofinanza"
-
-Return JSON:
+Rispondi ESCLUSIVAMENTE con un oggetto JSON valido, senza testo prima o dopo, senza markdown, senza backtick. Solo JSON puro:
 {
-  "own_events": [{"date": "DD/MM", "title": "EVENT_NAME", "city": "CITY", "type": "roadshow", "description": "Details", "source_url": "URL"}],
-  "industry_events": [{"date": "DD/MM", "title": "EVENT", "city": "CITY", "presence": true, "role": "speaker", "description": "Details", "source_url": "URL"}],
-  "timeline_comment": "Analysis",
-  "media_mentions": {"count": 0, "top_outlets": ["outlet"], "key_topics": ["topic"]},
-  "awards_recognitions": {"count": 0, "list": []},
-  "reputation_scores": {"media_authority": 7.0, "innovation_narrative": 7.0, "relationship_intensity": 7.0, "thought_leadership": 7.0, "social_presence": 7.0, "competitive_differentiation": 7.0},
-  "sources": ["url"]
+  "events": [
+    {"date": "DD/MM/YYYY", "title": "nome evento", "city": "città", "type": "tipo", "link": "url se disponibile"}
+  ],
+  "awards": ["award1", "award2"],
+  "mentions": 0,
+  "top_outlets": ["testata1", "testata2"],
+  "positioning": "descrizione positioning basata su ricerca",
+  "key_topics": ["tema1", "tema2"]
 }`;
 
-  try {
-    const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 2000,
-      system: systemPrompt,
-      tools: [
-        {
-          name: "web_search",
-          description: "Search the web for Italian market data",
-          input_schema: {
-            type: "object",
-            properties: {
-              query: { type: "string", description: "Search query" }
+  const response = await client.messages.create({
+    model: 'claude-opus-4-6',
+    max_tokens: 3000,
+    tools: [
+      {
+        name: 'brand_analysis',
+        description: 'Restituisce l\'analisi strutturata del brand',
+        input_schema: {
+          type: 'object',
+          properties: {
+            events: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  date: { type: 'string' },
+                  title: { type: 'string' },
+                  city: { type: 'string' },
+                  type: { type: 'string' },
+                  link: { type: 'string' }
+                },
+                required: ['date', 'title', 'city', 'type']
+              }
             },
-            required: ["query"]
-          }
+            awards: { type: 'array', items: { type: 'string' } },
+            mentions: { type: 'number' },
+            top_outlets: { type: 'array', items: { type: 'string' } },
+            positioning: { type: 'string' },
+            key_topics: { type: 'array', items: { type: 'string' } }
+          },
+          required: ['events', 'awards', 'mentions', 'top_outlets', 'positioning', 'key_topics']
         }
-      ],
-      messages: [{ role: "user", content: userPrompt }],
-    });
+      }
+    ],
+    tool_choice: { type: 'tool', name: 'brand_analysis' },
+    messages: [{ role: 'user', content: userPrompt }]
+  });
 
-    let data = null;
+  const toolUseBlock = response.content.find(block => block.type === 'tool_use');
+
+  if (!toolUseBlock || !toolUseBlock.input) {
     for (const block of response.content) {
-      if (block.type === "text") {
-        try {
-          const jsonMatch = block.text.match(/\{[\s\S]*\}/);
-          if (jsonMatch) {
-            data = JSON.parse(jsonMatch[0]);
-            console.log(`Successfully parsed data for ${brand}`);
+      if (block.type === 'text') {
+        const mdMatch = block.text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+        const rawMatch = block.text.match(/\{[\s\S]*\}/);
+        const jsonStr = mdMatch ? mdMatch[1] : rawMatch ? rawMatch[0] : null;
+        if (jsonStr) {
+          try {
+            return JSON.parse(jsonStr);
+          } catch (e) {
+            // continua
           }
-        } catch (e) {
-          console.error("JSON parse error:", e.message);
         }
       }
     }
-
-    if (!data) {
-      console.log(`Using fallback data for ${brand}`);
-      data = generateFallbackData(brand, trimester);
-    }
-
-    return data;
-  } catch (error) {
-    console.error("API Error:", error.message);
-    return generateFallbackData(brand, trimester);
+    throw new Error('No valid JSON in response');
   }
-}
 
-function generateFallbackData(brand, trimester) {
-  return {
-    own_events: [
-      { date: "05/02", title: "Roadshow Gestione Patrimoniale", city: "Milano", type: "roadshow", description: "Multi-city wealth management roadshow", source_url: "https://advisoronline.it" },
-      { date: "15/03", title: "Webinar Longevity Planning", city: "Online", type: "webinar", description: "Digital event on longevity strategies", source_url: "https://milanofinanza.it" }
-    ],
-    industry_events: [
-      { date: "05/02", title: "AIPB Annuario 2026", city: "Milano", presence: true, role: "sponsor", description: "Industry annual conference", source_url: "https://aipb.it" },
-      { date: "15/03", title: "Salone del Risparmio", city: "Milano", presence: true, role: "speaker", description: "Major Italian financial forum", source_url: "https://salonedelrisparmio.it" }
-    ],
-    timeline_comment: `${brand} demonstrated strategic market presence in ${trimester} 2026 through key industry events and proprietary initiatives.`,
-    media_mentions: { count: 12, top_outlets: ["advisoronline.it", "milanofinanza.it", "wallstreetitalia.it"], key_topics: ["wealth management", "longevity", "digital assets"] },
-    awards_recognitions: { count: 2, list: ["Best Asset Manager Award 2026", "Innovation in Finance Recognition"] },
-    reputation_scores: {
-      media_authority: 7.2,
-      innovation_narrative: 7.4,
-      relationship_intensity: 7.6,
-      thought_leadership: 7.1,
-      social_presence: 7.0,
-      competitive_differentiation: 7.3
-    },
-    sources: ["https://advisoronline.it", "https://milanofinanza.it", "https://wallstreetitalia.it"]
-  };
+  return toolUseBlock.input;
 }
