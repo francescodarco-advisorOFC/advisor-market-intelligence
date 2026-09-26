@@ -195,7 +195,7 @@ const STATI = {ok: "Disponibile", dub: "In dubbio", inf: "Infortunato", squ: "Sq
 const ME = "me";
 
 const DEF_CONFIG = {
-  nomeSquadra: "La mia squadra", crediti: 500, partecipanti: 10,
+  nomeSquadra: "La mia squadra", crediti: 1000, partecipanti: 10,
   slot: {P: 3, D: 8, C: 8, A: 6}, perc: {P: 7, D: 18, C: 30, A: 45},
   bonus: {gol: 3, rig: 3, ass: 1, amm: -0.5, esp: -1, gs: -1, rp: 3, rs: -3, au: -2},
   rimborso: "quota", giornata: null
@@ -211,6 +211,9 @@ const S = {
 try { const t = localStorage.getItem("fanta.tab"); if (t) S.tab = t; } catch (e) {}
 
 const cfg = () => ({...DEF_CONFIG, ...(S.config || {}), slot: {...DEF_CONFIG.slot, ...(S.config?.slot || {})}, perc: {...DEF_CONFIG.perc, ...(S.config?.perc || {})}, bonus: {...DEF_CONFIG.bonus, ...(S.config?.bonus || {})}});
+const LISTONE_BASE = 500;
+const scala = () => cfg().crediti / LISTONE_BASE;
+const qv = p => Math.max(1, Math.round(p.q * scala()));
 const asta = () => ({presi: {}, obiettivi: {}, avversari: [], ...(S.asta || {})});
 const ops = () => (S.mov?.ops || []);
 
@@ -262,7 +265,7 @@ function priceModel() {
   for (const r of ROLES) {
     const need = c.partecipanti * c.slot[r];
     const pool = players().list.filter(p => p.r === r).slice(0, need);
-    const sumQ = pool.reduce((s, p) => s + p.q, 0) || 1;
+    const sumQ = pool.reduce((s, p) => s + p.q, 0) + Math.max(0, need - pool.length) || 1;
     const budget = c.crediti * c.partecipanti * c.perc[r] / 100;
     res[r] = {k: budget / sumQ, need, cut: pool.length ? pool[pool.length - 1].q : 1, rank: Object.fromEntries(pool.map((p, i) => [p.id, i]))};
   }
@@ -336,7 +339,7 @@ async function buy(pid, by, prezzo, tipo) {
   await addOp({tipo, pid, by, prezzo, delta: -prezzo});
   const p = players().byId[pid]; toast(`${p?.n || pid} → ${by === ME ? "la tua rosa" : by} a ${prezzo}`);
 }
-function refundFor(p, prezzo) { const r = cfg().rimborso; return r === "quota" ? p.q : r === "prezzo" ? prezzo : r === "meta" ? Math.ceil(prezzo / 2) : 0; }
+function refundFor(p, prezzo) { const r = cfg().rimborso; return r === "quota" ? qv(p) : r === "prezzo" ? prezzo : r === "meta" ? Math.ceil(prezzo / 2) : 0; }
 async function release(pid) {
   const a = asta(); const o = a.presi[pid]; if (!o) return; const p = players().byId[pid];
   const rimb = p ? refundFor(p, o.prezzo) : 0;
@@ -544,10 +547,10 @@ async function ask(kind, out, btn) {
   } else if (kind === "asta") {
     const pm = priceModel(); const inf = inflation(pm);
     const tops = ROLES.map(r => `${ROLE_NAME[r]}: ` + players().list.filter(p => p.r === r && !owner(p.id)).slice(0, 12).map(p => `${p.n} (${p.team}, q${p.q}, stima ${suggestPrice(p, pm)})`).join("; ")).join("\n");
-    prompt = `Sei un esperto di aste del Fantacalcio classic. Lega da ${c.partecipanti} squadre, ${c.crediti} crediti a testa, rosa ${c.slot.P}P ${c.slot.D}D ${c.slot.C}C ${c.slot.A}A. Mi restano ${credits(ME)} crediti.\nLa mia rosa finora:\n${rosaContext() || "vuota"}\n\nInflazione osservata: ${inf.n >= 3 ? ((inf.ratio - 1) * 100).toFixed(0) + "%" : "non ancora misurabile"}.\nMigliori giocatori ancora liberi:\n${tops}\n\nDammi una strategia concreta per il resto dell'asta: su chi spingere, chi evitare, come ripartire i crediti rimasti per ruolo, e 3 nomi a basso costo per ruolo. Rispondi in italiano, conciso, con elenchi puntati semplici.`;
+    prompt = `Sei un esperto di aste del Fantacalcio classic. Lega da ${c.partecipanti} squadre, ${c.crediti} crediti a testa, rosa ${c.slot.P}P ${c.slot.D}D ${c.slot.C}C ${c.slot.A}A. Le quote (q) sono del listone su base ${LISTONE_BASE}: con ${c.crediti} crediti valgono circa ×${f1(scala())}; le stime di prezzo sono già in crediti della lega. Mi restano ${credits(ME)} crediti.\nLa mia rosa finora:\n${rosaContext() || "vuota"}\n\nInflazione osservata: ${inf.n >= 3 ? ((inf.ratio - 1) * 100).toFixed(0) + "%" : "non ancora misurabile"}.\nMigliori giocatori ancora liberi:\n${tops}\n\nDammi una strategia concreta per il resto dell'asta: su chi spingere, chi evitare, come ripartire i crediti rimasti per ruolo, e 3 nomi a basso costo per ruolo. Rispondi in italiano, conciso, con elenchi puntati semplici.`;
   } else {
     const free = ROLES.map(r => `${ROLE_NAME[r]}: ` + players().list.filter(p => p.r === r && !owner(p.id) && p.pv >= 1).sort((a, b) => (b.forma || 0) - (a.forma || 0)).slice(0, 8).map(p => `${p.n} (${p.team}, q${p.q}, FM ${f1(p.fm)}, ultime3 ${f1(p.forma)})`).join("; ")).join("\n");
-    prompt = `Sei un esperto di Fantacalcio classic. Siamo alla giornata ${G}. Mi restano ${credits(ME)} crediti. Svincolo rimborsa: ${c.rimborso}.\nLa mia rosa:\n${rosaContext() || "vuota"}\n\nSvincolati più in forma:\n${free}\n\nSuggerisci al massimo 3 operazioni di mercato (chi cedere, chi prendere, a quanto), motivando con i numeri. Rispondi in italiano, conciso, elenchi puntati semplici.`;
+    prompt = `Sei un esperto di Fantacalcio classic. Siamo alla giornata ${G}. Crediti iniziali ${c.crediti}, me ne restano ${credits(ME)}. Le quote (q) sono su base ${LISTONE_BASE}: moltiplica per ${f1(scala())} per avere i crediti della lega. Svincolo rimborsa: ${c.rimborso}.\nLa mia rosa:\n${rosaContext() || "vuota"}\n\nSvincolati più in forma:\n${free}\n\nSuggerisci al massimo 3 operazioni di mercato (chi cedere, chi prendere, a quanto), motivando con i numeri. Rispondi in italiano, conciso, elenchi puntati semplici.`;
   }
   const ctl = new AbortController();
   btn.disabled = true; out.hidden = false; out.textContent = "Claude sta ragionando…";
@@ -685,9 +688,9 @@ function vAsta() {
     <details id="det-rules" ${S.ui.open?.["det-rules"] ? "open" : ""}><summary>Regole della lega</summary>
       <div class="grid g4" style="margin-top:12px">
         <div class="field"><label class="lbl" for="c-name">Nome della tua squadra</label><input type="text" id="c-name" value="${esc(c.nomeSquadra)}"></div>
-        <div class="field"><label class="lbl" for="c-cred">Crediti a testa</label><input type="number" id="c-cred" value="${c.crediti}"></div>
+        <div class="field"><label class="lbl" for="c-cred">Crediti a testa (listone ×${f1(scala())})</label><input type="number" id="c-cred" value="${c.crediti}"></div>
         <div class="field"><label class="lbl" for="c-part">Partecipanti</label><input type="number" id="c-part" value="${c.partecipanti}"></div>
-        <div class="field"><label class="lbl" for="c-rimb">Rimborso svincolo</label><select id="c-rimb">${[["quota", "Quotazione attuale"], ["prezzo", "Prezzo pagato"], ["meta", "Metà del prezzo"], ["zero", "Nessuno"]].map(([k, l]) => `<option value="${k}" ${c.rimborso === k ? "selected" : ""}>${l}</option>`).join("")}</select></div>
+        <div class="field"><label class="lbl" for="c-rimb">Rimborso svincolo</label><select id="c-rimb">${[["quota", "Quotazione attuale riscalata"], ["prezzo", "Prezzo pagato"], ["meta", "Metà del prezzo"], ["zero", "Nessuno"]].map(([k, l]) => `<option value="${k}" ${c.rimborso === k ? "selected" : ""}>${l}</option>`).join("")}</select></div>
       </div>
       <div class="lbl" style="margin-top:12px">Posti in rosa e % del budget per ruolo</div>
       <div class="row" style="margin-top:6px">${ROLES.map(r => `<div class="field">${roleTag(r)}<input type="number" id="c-slot-${r}" value="${c.slot[r]}" aria-label="Posti ${ROLE_NAME[r]}"><input type="number" id="c-perc-${r}" value="${c.perc[r]}" aria-label="Percentuale budget ${ROLE_NAME[r]}"></div>`).join("")}</div>
@@ -752,8 +755,8 @@ function vMercato() {
     </div>
     <div class="panel"><div class="panel-h"><h2>Acquista uno svincolato</h2><span class="pill">Crediti <b>${credits(ME)}</b></span></div>
       <input type="search" id="m-q" placeholder="Cerca tra i liberi…" value="${esc(u.mercQ)}" aria-label="Cerca svincolato">
-      ${sugg.length ? `<div class="suggest">${sugg.map(p => `<button data-mpick="${p.id}">${roleTag(p.r)}<span class="pname">${esc(p.n)}</span><span class="team">${esc(p.sigla)}</span><span class="spacer"></span><span class="small muted">Qt ${p.q} · FM ${f1(p.fm)}</span></button>`).join("")}</div>` : ""}
-      ${pick ? `<div class="row">${roleTag(pick.r)}<b>${esc(pick.n)}</b><span class="team">${esc(pick.team)}</span><span class="spacer"></span><div class="field"><label class="lbl" for="m-price">Prezzo</label><input type="number" id="m-price" min="0" value="${Math.max(1, Math.min(credits(ME), pick.q))}"></div><button class="btn primary" id="m-buy" style="align-self:flex-end">Acquista</button></div>` : `<div class="small muted">Il prezzo proposto è la quotazione attuale, modificabile.</div>`}
+      ${sugg.length ? `<div class="suggest">${sugg.map(p => `<button data-mpick="${p.id}">${roleTag(p.r)}<span class="pname">${esc(p.n)}</span><span class="team">${esc(p.sigla)}</span><span class="spacer"></span><span class="small muted">Qt ${p.q} · ≈${qv(p)} cr · FM ${f1(p.fm)}</span></button>`).join("")}</div>` : ""}
+      ${pick ? `<div class="row">${roleTag(pick.r)}<b>${esc(pick.n)}</b><span class="team">${esc(pick.team)}</span><span class="spacer"></span><div class="field"><label class="lbl" for="m-price">Prezzo</label><input type="number" id="m-price" min="0" value="${Math.max(1, Math.min(credits(ME), qv(pick)))}"></div><button class="btn primary" id="m-buy" style="align-self:flex-end">Acquista</button></div>` : `<div class="small muted">Il prezzo proposto è la quotazione riscalata sui tuoi ${cfg().crediti} crediti (×${f1(scala())}), modificabile.</div>`}
     </div>
   </section>
   <section class="panel"><div class="panel-h"><h2>Occasioni tra i liberi</h2><span class="small muted">migliori per punteggio atteso</span></div>
@@ -830,7 +833,7 @@ function openDrawer(pid) {
   $("#drawerHost").innerHTML = `<div class="scrim" id="scrim"><aside class="drawer" role="dialog" aria-modal="true" aria-label="${esc(p.n)}">
     <div class="row"><span>${roleTag(p.r)}</span><h2 style="flex:1">${esc(p.n)}</h2><button class="btn sm" id="d-close" aria-label="Chiudi">Chiudi</button></div>
     <div class="row small"><span class="team">${esc(p.team)}</span>${stTag(p.st)}${ownTag(pid)}</div>
-    <div class="grid g4" style="grid-template-columns:repeat(4,1fr);gap:8px">${[["Qt", p.q], ["Pv", p.pv], ["FM", f1(p.fm)], ["Ult. 3", f1(p.forma)], ["MV", f1(p.mv)], ["Gol", p.gol], ["Ass", p.ass], ["Asta", suggestPrice(p, pm)]].map(([l, v]) => `<div class="kpi"><span class="lbl">${l}</span><b style="font-size:1.5rem">${v}</b></div>`).join("")}</div>
+    <div class="grid g4" style="grid-template-columns:repeat(3,1fr);gap:8px">${[["Qt", p.q], ["Pv", p.pv], ["FM", f1(p.fm)], ["Ult. 3", f1(p.forma)], ["MV", f1(p.mv)], ["Gol", p.gol], ["Ass", p.ass], ["Valore", qv(p)], ["Asta", suggestPrice(p, pm)]].map(([l, v]) => `<div class="kpi"><span class="lbl">${l}</span><b style="font-size:1.5rem">${v}</b></div>`).join("")}</div>
     <div class="panel">${lineChart(p, G)}</div>
     <div class="panel"><h3>Modifica</h3>
       <div class="row">
