@@ -71,7 +71,11 @@ tendenze di Google Trends Italia e i suggerimenti di ricerca Google.
 - **Coverage.** Per ogni testata che tratta l'argomento, fino a 4 articoli
   `{t: titolo, u: url, k: "pub" | "home"}`; `pub` se viene da `published`,
   `home` se solo dalla homepage. Copia titoli e url dal raw.
-- **Advisor** è la testata `advisor`. `finalize.mjs` ricava da coverage se un
+- **Advisor** è la testata `advisor`. I suoi articoli in `published` vengono
+  dall'archivio completo di advisoronline.it/articles (canale `archivio`), con
+  data, ora e sezione esatte: considerali la fonte certa su cosa abbiamo
+  pubblicato. `home` per Advisor è la vetrina della stessa pagina al momento
+  del run. `finalize.mjs` ricava da coverage se un
   argomento è "solo noi", "ci manca" o "in comune".
 - **readerSignal** (`alto`, `medio`, `basso`, `nessuno`) misura solo l'evidenza
   sui lettori: tendenze di Google Trends e suggerimenti di ricerca. Non
@@ -128,7 +132,8 @@ Truffe e tutela del risparmiatore · Eventi e premi · Altro.
 
 - Citywire (Incapsula) e FocusRisparmio (certificato non accettato dal proxy)
   si leggono solo via Google News.
-- La homepage di Advisor risponde a fatica ai browser automatici: si usa la
-  pagina "Ultime news".
+- Per Advisor si legge l'archivio di advisoronline.it/articles tramite l'API
+  che alimenta la pagina (advisoronline.stellate.sh); se non risponde si
+  ripiega su Google News. La homepage risponde a fatica ai browser automatici.
 - Social network (LinkedIn, X, Facebook, Reddit) non sono accessibili senza API.
 - I dati di lettura di Advisor (Google Analytics, newsletter) non sono collegati.

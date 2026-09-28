@@ -527,7 +527,7 @@ function renderSources() {
       el('b', { text: s.name }),
       el('div', { class: 'mono', text: `${s.published} pubblicati nella finestra · ${s.home} in home` }),
       el('dl', {}, ...Object.entries(s.channels).filter(([, v]) => v !== 'non previsto').flatMap(([k, v]) => [
-        el('dt', { text: { home: 'Homepage', rss: 'Feed RSS', gnews: 'Google News', latest: 'Ultime news' }[k] || k }),
+        el('dt', { text: { home: 'Homepage', rss: 'Feed RSS', gnews: 'Google News', latest: 'Pagina articoli', archive: 'Archivio articoli' }[k] || k }),
         el('dd', { text: v }),
       ])))),
   );

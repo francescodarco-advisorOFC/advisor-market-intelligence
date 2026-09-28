@@ -4,14 +4,19 @@
 //   rss   — il feed nativo, filtrato sulla finestra temporale
 //   gnews — Google News "site:" come ripiego quando il sito blocca i bot
 //   latest — una pagina "ultime notizie" letta come HTML (solo Advisor)
+//   archive — l'archivio completo con data e ora, dall'API del sito (solo Advisor)
 
 export const OUTLETS = [
   {
     id: 'advisor',
     name: 'Advisor',
     own: true,
-    // La home risponde a fatica ai browser automatici: si legge la pagina
-    // "Ultime news", che arriva già renderizzata dal server.
+    site: 'https://advisoronline.it',
+    // advisoronline.it/articles raccoglie tutti gli articoli pubblicati: la
+    // pagina si alimenta da questa API, che dà data e ora di ogni contenuto.
+    archiveApi: 'https://advisoronline.stellate.sh',
+    // La stessa pagina letta come HTML: i titoli in vetrina al momento del run.
+    // (La home risponde a fatica ai browser automatici.)
     latest: 'https://advisoronline.it/articles',
     gnews: 'site:advisoronline.it',
   },

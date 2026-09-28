@@ -81,6 +81,39 @@ async function fromGoogleNews(query, suffix) {
     .filter((i) => new Date(i.time) >= since);
 }
 
+// Archivio completo di advisoronline.it/articles: la pagina si alimenta da
+// un'API GraphQL pubblica (Strapi) che restituisce ogni contenuto con data e
+// ora di pubblicazione. Scorriamo le pagine finché usciamo dalla finestra.
+async function fromAdvisorArchive(apiUrl, siteUrl) {
+  const out = [];
+  for (let page = 1; page <= 10; page++) {
+    const query = `query { contents(sort: "publishedAt:desc", pagination: {page: ${page}, pageSize: 50}) {
+      data { attributes { title slug shortDescription publishedAt
+        category { data { attributes { name slug parentCategory { data { attributes { slug } } } } } } } } } }`;
+    const { stdout } = await run(
+      'curl',
+      ['-sS', '-m', '30', '-A', UA, '-H', 'Content-Type: application/json', '-H', `Origin: ${siteUrl}`, '-d', JSON.stringify({ query }), apiUrl],
+      { maxBuffer: 20e6 },
+    );
+    const rows = JSON.parse(stdout).data?.contents?.data;
+    if (!rows) throw new Error('risposta inattesa dall’API');
+    for (const { attributes: a } of rows) {
+      const cat = a.category?.data?.attributes;
+      const parent = cat?.parentCategory?.data?.attributes?.slug || cat?.slug;
+      out.push({
+        title: decode(a.title),
+        url: cat ? `${siteUrl}/${parent}/${cat.slug}/${a.slug}` : `${siteUrl}/articles`,
+        time: new Date(a.publishedAt).toISOString(),
+        section: cat?.name || '',
+        summary: decode(a.shortDescription || '').slice(0, 240),
+        channel: 'archivio',
+      });
+    }
+    if (!rows.length || new Date(rows.at(-1).attributes.publishedAt) < since) break;
+  }
+  return out.filter((i) => new Date(i.time) >= since);
+}
+
 // Pagina "Ultime news" di Advisor: link articolo = /sezione/sottosezione/slug,
 // dentro il link ci sono etichetta di sezione, titolo e sommario.
 async function fromAdvisorLatest(url) {
@@ -219,13 +252,18 @@ async function main() {
     console.error(`- ${o.name}`);
     const home = o.home ? await settle(`${o.id} home`, () => fromHome(browser, o.home)) : null;
     const latest = o.latest ? await settle(`${o.id} ultime`, () => fromAdvisorLatest(o.latest)) : null;
+    const archive = o.archiveApi ? await settle(`${o.id} archivio`, () => fromAdvisorArchive(o.archiveApi, o.site)) : null;
     const [rss, gnews] = await Promise.all([
       o.rss ? settle(`${o.id} rss`, () => fromRss(o.rss)) : null,
       o.gnews ? settle(`${o.id} gnews`, () => fromGoogleNews(o.gnews, o.gnewsTitleSuffix)) : null,
     ]);
-    // Un articolo può arrivare da più canali: lo teniamo una volta, preferendo il feed.
+    // Un articolo può arrivare da più canali: lo teniamo una volta, preferendo
+    // l'archivio del sito, poi il feed, poi Google News.
     const byTitle = new Map();
-    for (const it of [...(rss?.value || []), ...(gnews?.value || [])]) {
+    // Se l'archivio risponde è completo e preciso: Google News aggiungerebbe
+    // solo doppioni con titoli troncati.
+    const fallback = archive?.ok ? [] : [...(rss?.value || []), ...(gnews?.value || [])];
+    for (const it of [...(archive?.value || []), ...fallback]) {
       const key = it.title.toLowerCase().slice(0, 80);
       if (!byTitle.has(key)) byTitle.set(key, it);
     }
@@ -234,6 +272,7 @@ async function main() {
       name: o.name,
       own: !!o.own,
       channels: {
+        archive: archive ? (archive.ok ? `ok (${archive.value.length} nella finestra)` : `errore: ${archive.error}`) : 'non previsto',
         latest: latest ? (latest.ok ? `ok (${latest.value.length} ultimi articoli)` : `errore: ${latest.error}`) : 'non previsto',
         home: home ? (home.ok ? `ok (${home.value.headlines.length} titoli)` : `errore: ${home.error}`) : 'non previsto',
         rss: rss ? (rss.ok ? `ok (${rss.value.length} nella finestra)` : `errore: ${rss.error}`) : 'non previsto',
