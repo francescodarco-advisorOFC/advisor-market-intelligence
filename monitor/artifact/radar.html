@@ -1,0 +1,702 @@
+<title>Radar Advisor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=Libre+Franklin:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --paper: #f5f6f3;
+  --sheet: #ffffff;
+  --ink: #15202e;
+  --ink-2: #4a5566;
+  --ink-3: #7a8494;
+  --rule: #dfe2e6;
+  --rule-strong: #c5cad2;
+  --advisor: #b3261e;
+  --advisor-soft: #f7e3e1;
+  --only: #2e7a57;
+  --only-soft: #e1f0e8;
+  --miss: #a86a12;
+  --miss-soft: #f6ead6;
+  --shared: #3d5a80;
+  --shared-soft: #e3e9f2;
+  --dot-empty: #e8eaee;
+  --focus: #1f6feb;
+  --display: "Newsreader", Georgia, "Times New Roman", serif;
+  --body: "Libre Franklin", "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #10151c;
+    --sheet: #171e27;
+    --ink: #e8ebef;
+    --ink-2: #b3bcc8;
+    --ink-3: #8390a0;
+    --rule: #28313d;
+    --rule-strong: #3a4552;
+    --advisor: #ef6b5f;
+    --advisor-soft: #3a1e1c;
+    --only: #5cc293;
+    --only-soft: #173327;
+    --miss: #e0a54a;
+    --miss-soft: #3a2c15;
+    --shared: #86a7d6;
+    --shared-soft: #1d2a3d;
+    --dot-empty: #26303b;
+    --focus: #6ea8ff;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #10151c;
+  --sheet: #171e27;
+  --ink: #e8ebef;
+  --ink-2: #b3bcc8;
+  --ink-3: #8390a0;
+  --rule: #28313d;
+  --rule-strong: #3a4552;
+  --advisor: #ef6b5f;
+  --advisor-soft: #3a1e1c;
+  --only: #5cc293;
+  --only-soft: #173327;
+  --miss: #e0a54a;
+  --miss-soft: #3a2c15;
+  --shared: #86a7d6;
+  --shared-soft: #1d2a3d;
+  --dot-empty: #26303b;
+  --focus: #6ea8ff;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--paper); color: var(--ink); font: 15px/1.5 var(--body); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 20px 56px; display: grid; gap: 28px; }
+a { color: inherit; }
+button, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+.eyebrow { font: 600 11px/1.2 var(--body); letter-spacing: .09em; text-transform: uppercase; color: var(--ink-3); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* Testata */
+.masthead { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px; border-bottom: 2px solid var(--ink); padding-bottom: 14px; }
+.masthead h1 { font: 600 34px/1 var(--display); letter-spacing: -.01em; }
+.masthead h1 span { color: var(--advisor); }
+.masthead p { margin: 6px 0 0; color: var(--ink-2); max-width: 60ch; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.field { display: grid; gap: 4px; }
+.field label { font-size: 12px; color: var(--ink-3); }
+select { background: var(--sheet); border: 1px solid var(--rule-strong); border-radius: 6px; padding: 8px 10px; min-width: 0; max-width: 100%; }
+.btn { border: 1px solid var(--ink); background: var(--ink); color: var(--paper); border-radius: 6px; padding: 9px 16px; font-weight: 600; cursor: pointer; }
+.btn:hover { filter: brightness(1.15); }
+.btn[disabled] { opacity: .55; cursor: default; filter: none; }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--rule-strong); font-weight: 500; }
+.status { width: 100%; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; font-size: 13px; color: var(--ink-2); }
+.pill { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600; }
+.pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.pill.live { background: var(--only-soft); color: var(--only); }
+.pill.busy { background: var(--miss-soft); color: var(--miss); }
+.pill.off { background: var(--dot-empty); color: var(--ink-3); }
+.pill.err { background: var(--advisor-soft); color: var(--advisor); }
+.pill.busy::before { animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { opacity: .25; } }
+@media (prefers-reduced-motion: reduce) { .pill.busy::before { animation: none; } }
+
+/* Verdetto */
+.verdict { display: grid; gap: 18px; }
+.verdict h2 { font: 500 26px/1.25 var(--display); max-width: 58ch; }
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
+.kpi { background: var(--sheet); padding: 14px 16px; display: grid; gap: 2px; }
+.kpi b { font: 600 30px/1 var(--display); font-variant-numeric: tabular-nums; }
+.kpi span { font-size: 13px; color: var(--ink-2); }
+.kpi.only b { color: var(--only); }
+.kpi.miss b { color: var(--miss); }
+.kpi.shared b { color: var(--shared); }
+
+.board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
+.col { display: grid; align-content: start; gap: 10px; }
+.col h3 { font: 600 14px/1.3 var(--body); padding-top: 10px; border-top: 3px solid var(--ink-3); }
+.col.plus h3 { border-color: var(--only); }
+.col.minus h3 { border-color: var(--miss); }
+.col.readers h3 { border-color: var(--shared); }
+.col.actions h3 { border-color: var(--advisor); }
+.col ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.col li { font-size: 14px; color: var(--ink-2); padding-left: 12px; position: relative; }
+.col li::before { content: ""; position: absolute; left: 0; top: .6em; width: 5px; height: 5px; border-radius: 50%; background: var(--rule-strong); }
+
+/* Schede */
+.tabs { display: flex; flex-wrap: wrap; gap: 4px; border-bottom: 1px solid var(--rule-strong); }
+.tab { background: none; border: 0; border-bottom: 3px solid transparent; padding: 10px 14px; margin-bottom: -1px; cursor: pointer; font-weight: 600; color: var(--ink-3); }
+.tab[aria-selected="true"] { color: var(--ink); border-color: var(--advisor); }
+.panel { display: grid; gap: 16px; }
+
+/* Matrice argomenti */
+.filters { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--rule-strong); background: var(--sheet); border-radius: 999px; padding: 5px 12px; font-size: 13px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.chip .n { font-family: var(--mono); font-size: 12px; opacity: .75; margin-left: 4px; }
+.matrix-scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); }
+table.matrix { border-collapse: collapse; width: 100%; min-width: 820px; }
+.matrix th, .matrix td { border-bottom: 1px solid var(--rule); padding: 8px 10px; text-align: left; vertical-align: middle; }
+.matrix thead th { font: 600 11px/1.2 var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); position: sticky; top: 0; background: var(--sheet); }
+.matrix thead th.o { text-align: center; width: 74px; }
+.matrix thead th.o.us { color: var(--advisor); }
+.matrix tbody tr.row { cursor: pointer; }
+.matrix tbody tr.row:hover { background: var(--paper); }
+.topic { display: grid; gap: 3px; }
+.topic b { font-weight: 600; font-size: 14px; }
+.topic small { color: var(--ink-3); font-size: 12px; }
+.state { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; border-radius: 4px; padding: 2px 6px; white-space: nowrap; }
+.state.only { background: var(--only-soft); color: var(--only); }
+.state.miss { background: var(--miss-soft); color: var(--miss); }
+.state.shared { background: var(--shared-soft); color: var(--shared); }
+td.dot { text-align: center; }
+.d { display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: var(--dot-empty); vertical-align: middle; }
+.d.on { background: var(--shared); }
+.d.on.home { background: transparent; border: 3px solid var(--shared); }
+.d.us.on { background: var(--advisor); }
+.d.us.on.home { background: transparent; border-color: var(--advisor); }
+.sig { font-family: var(--mono); font-size: 12px; white-space: nowrap; }
+.bars { display: inline-flex; gap: 2px; vertical-align: middle; margin-right: 6px; }
+.bars i { width: 4px; height: 12px; background: var(--dot-empty); border-radius: 1px; }
+.bars.l1 i:nth-child(-n+1), .bars.l2 i:nth-child(-n+2), .bars.l3 i:nth-child(-n+3) { background: var(--shared); }
+tr.detail td { background: var(--paper); padding: 14px 16px 18px; }
+.detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.detail-grid .src { display: grid; gap: 6px; align-content: start; }
+.detail-grid .src h4 { margin: 0; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); }
+.detail-grid .src.us h4 { color: var(--advisor); }
+.detail-grid a { font-size: 14px; text-decoration: none; border-bottom: 1px solid var(--rule-strong); }
+.detail-grid a:hover { border-color: currentColor; }
+.tag { font-size: 11px; color: var(--ink-3); margin-left: 4px; }
+.note { font-size: 13px; color: var(--ink-2); margin: 10px 0 0; max-width: 90ch; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--ink-3); align-items: center; }
+.legend span { display: inline-flex; gap: 6px; align-items: center; }
+
+/* Lettori */
+.two { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 24px; }
+.themes { display: grid; gap: 10px; }
+.theme { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 14px; display: grid; gap: 6px; }
+.theme header { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.theme b { font-size: 15px; }
+.theme p { margin: 0; font-size: 13px; color: var(--ink-2); }
+.theme .who { font-size: 12px; color: var(--ink-3); }
+.theme .who strong { color: var(--advisor); }
+.theme .who strong.no { color: var(--miss); }
+.list { display: grid; gap: 0; background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; }
+.list > div { padding: 10px 14px; border-bottom: 1px solid var(--rule); display: grid; gap: 3px; }
+.list > div:last-child { border-bottom: 0; }
+.list .row1 { display: flex; justify-content: space-between; gap: 10px; }
+.list .row1 b { font-weight: 600; font-size: 14px; }
+.list small { color: var(--ink-3); font-size: 12px; }
+.list .rel { color: var(--only); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+.seeds { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.seed { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; }
+.seed b { font-size: 13px; display: block; margin-bottom: 4px; }
+.seed span { display: inline-block; font-size: 12px; color: var(--ink-2); background: var(--paper); border-radius: 4px; padding: 1px 6px; margin: 2px 4px 2px 0; }
+
+/* Fonti */
+.sources { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+.source { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 14px; display: grid; gap: 6px; }
+.source.us { border-color: var(--advisor); }
+.source b { font-size: 15px; }
+.source dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; font-size: 12px; }
+.source dt { color: var(--ink-3); }
+.source dd { margin: 0; color: var(--ink-2); }
+.limits { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 13px; display: grid; gap: 6px; max-width: 95ch; }
+
+/* Chiedi */
+.ask { display: grid; gap: 10px; max-width: 820px; }
+.ask textarea { width: 100%; min-height: 84px; border: 1px solid var(--rule-strong); border-radius: 8px; padding: 10px 12px; background: var(--sheet); resize: vertical; }
+.ask .row { display: flex; gap: 8px; flex-wrap: wrap; }
+.answer { white-space: pre-wrap; background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; font-size: 14px; }
+.hint { font-size: 13px; color: var(--ink-3); }
+.banner { border-radius: 8px; padding: 10px 14px; font-size: 14px; background: var(--miss-soft); color: var(--ink); border: 1px solid var(--rule); }
+.banner.err { background: var(--advisor-soft); }
+
+@media (max-width: 900px) {
+  .board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .two { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .wrap { padding-inline: 16px; }
+  .masthead h1 { font-size: 28px; }
+  .verdict h2 { font-size: 21px; }
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .board { grid-template-columns: minmax(0, 1fr); }
+  .controls { width: 100%; }
+  .controls .field { flex: 1 1 140px; }
+}
+</style>
+
+<div class="wrap">
+  <header class="masthead">
+    <div>
+      <div class="eyebrow">Monitor redazionale · Advisor e 6 concorrenti</div>
+      <h1>Radar <span>Advisor</span></h1>
+      <p>Cosa pubblichiamo noi, cosa pubblicano gli altri e cosa cercano i lettori, nel momento in cui avvii l'analisi.</p>
+    </div>
+    <div class="controls">
+      <div class="field">
+        <label for="run-select">Analisi</label>
+        <select id="run-select" aria-label="Scegli un'analisi dallo storico"></select>
+      </div>
+      <div class="field">
+        <label for="window-select">Finestra</label>
+        <select id="window-select">
+          <option value="6">ultime 6 ore</option>
+          <option value="12">ultime 12 ore</option>
+          <option value="24" selected>ultime 24 ore</option>
+          <option value="48">ultime 48 ore</option>
+          <option value="72">ultime 72 ore</option>
+        </select>
+      </div>
+      <button class="btn" id="start-btn" type="button">Avvia nuova analisi</button>
+    </div>
+    <div class="status" id="status"></div>
+  </header>
+
+  <div id="banner" hidden></div>
+
+  <section class="verdict" aria-labelledby="verdict-title">
+    <div class="eyebrow" id="run-meta"></div>
+    <h2 id="verdict-title"></h2>
+    <div class="kpis" id="kpis"></div>
+    <div class="board" id="board"></div>
+  </section>
+
+  <section class="panel">
+    <div class="tabs" role="tablist" aria-label="Sezioni">
+      <button class="tab" role="tab" id="tab-topics" aria-controls="p-topics" aria-selected="true">Confronto argomenti</button>
+      <button class="tab" role="tab" id="tab-readers" aria-controls="p-readers" aria-selected="false">Lettori</button>
+      <button class="tab" role="tab" id="tab-sources" aria-controls="p-sources" aria-selected="false">Fonti del run</button>
+      <button class="tab" role="tab" id="tab-ask" aria-controls="p-ask" aria-selected="false">Chiedi a Claude</button>
+    </div>
+
+    <div class="panel" role="tabpanel" id="p-topics" aria-labelledby="tab-topics">
+      <div class="filters" id="filters"></div>
+      <div class="legend">
+        <span><i class="d us on"></i> Advisor ha pubblicato</span>
+        <span><i class="d on"></i> concorrente ha pubblicato nella finestra</span>
+        <span><i class="d on home"></i> solo in homepage (può essere più vecchio)</span>
+        <span><i class="bars l3"><i></i><i></i><i></i></i> interesse dei lettori</span>
+      </div>
+      <div class="matrix-scroll"><table class="matrix" id="matrix"></table></div>
+    </div>
+
+    <div class="panel" role="tabpanel" id="p-readers" aria-labelledby="tab-readers" hidden>
+      <div class="two">
+        <div class="themes" id="themes"></div>
+        <div style="display:grid;gap:10px;align-content:start">
+          <div class="eyebrow">Tendenze di ricerca in Italia (Google Trends)</div>
+          <div class="list" id="trends"></div>
+        </div>
+      </div>
+      <div class="eyebrow">Cosa digitano le persone (suggerimenti di ricerca Google)</div>
+      <div class="seeds" id="seeds"></div>
+    </div>
+
+    <div class="panel" role="tabpanel" id="p-sources" aria-labelledby="tab-sources" hidden>
+      <div class="sources" id="sources"></div>
+      <div class="eyebrow">Limiti di questo run</div>
+      <ul class="limits" id="limits"></ul>
+    </div>
+
+    <div class="panel" role="tabpanel" id="p-ask" aria-labelledby="tab-ask" hidden>
+      <div class="ask">
+        <label for="question" class="hint">Fai una domanda sull'analisi selezionata. Claude legge solo i dati di questo run.</label>
+        <textarea id="question">Quali tre pezzi dovremmo scrivere oggi per recuperare terreno, e con quale taglio per i consulenti?</textarea>
+        <div class="row">
+          <button class="btn" id="ask-btn" type="button">Chiedi</button>
+          <button class="btn ghost" id="stop-btn" type="button" hidden>Ferma</button>
+        </div>
+        <div class="answer" id="answer" hidden></div>
+        <p class="hint" id="ask-note"></p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const SEED = {"runId":"202609280845","runAt":"2026-09-28T08:45:15.129Z","windowHours":24,"status":"done","headline":"Advisor è avanti su istituzioni e reti, con 4 temi esclusivi. Mancano oro, BTP, ETF e previdenza, cioè i temi che i lettori stanno cercando. Il fiscal drag è il tema più cercato di oggi e nessuna testata lo tratta.","summary":{"plus":["Quattro temi solo nostri nelle ultime 24 ore: il nuovo assetto Consob, il confronto Anasf-Assoreti-Efpa sulle banche-reti, i rating Morningstar dei gestori e le anticipazioni del Fee-Only Summit. Il «+3%» di Marino (OCF) è quasi esclusivo: Wall Street Italia tocca il tema solo di sponda.","Il profilo è istituzionale e associativo, ed è distintivo: gli altri non coprono Consob, OCF e associazioni con lo stesso peso.","Sulla notizia Fideuram (294 ingressi) siamo in linea con Bluerating e Wall Street Italia, ma con più dettaglio.","Sui bond al 5% e sul private debt siamo allineati a FundsPeople."],"minus":["Nessun pezzo su oro, BTP Valore ed ETF, che sono tra i temi più cercati. Bluerating, Wall Street Italia e We Wealth li coprono.","Il caso delle truffe con l’intelligenza artificiale (Molesini e Fideuram) è in homepage su Bluerating e Wall Street Italia, non su Advisor.","Longevità e previdenza sono un filone forte per FundsPeople, Wall Street Italia e We Wealth: Advisor è assente nella finestra.","Sul reclutamento nelle reti Bluerating copre molte più reti (Widiba, Fineco, Mediolanum, BNL, Azimut)."],"readers":["Il tema legato al denaro più cercato oggi in Italia è il fiscal drag, la «tassa invisibile» da 13 miliardi su stipendi e pensioni (oltre 20.000 ricerche). Nessuna testata del panel lo tratta.","Domanda costante su prezzo dell’oro, ETF (cosa sono, oro, bitcoin, MSCI World), BTP (2037, Italia, rendimento netto), pensione anticipata e tassi BCE.","Sul consulente le persone cercano cose di base: cosa fa, indipendente, stipendio, Poste. Il pezzo di Marino (OCF) risponde proprio a questo."],"actions":["Un pezzo di servizio sul fiscal drag, pensato per il consulente: come spiegarlo al cliente e cosa cambia nella pianificazione.","Una scheda settimanale sulle novità ETF, per la sezione ETF e per la newsletter.","Riprendere il caso delle truffe con l’IA da un angolo professionale: come il consulente protegge il cliente e la propria reputazione.","Rilanciare sui social il «+3%» di Marino, agganciandolo alla domanda «cosa fa un consulente finanziario»."]},"topics":[{"id":"t1","label":"Fideuram ISPB: 294 ingressi da inizio anno","category":"Reti e consulenti","coverage":{"advisor":[{"t":"Fideuram ISPB, 294 ingressi da inizio anno. Ecco 6 reclutamenti di peso","u":"https://advisoronline.it/consulenti-finanziari/reti/fideuram-intesa-sanpaolo-private-banking-294-ingressi-da-inizio-anno-a-fine-agosto","k":"home"}],"bluerating":[{"t":"Fideuram Ispb, tra i nuovi ingressi ex di Azimut, Banca Mediolanum e FinecoBank","u":"https://www.bluerating.com/banche-e-reti/877489/fideuram-ispb-tra-i-nuovi-ingressi-ex-di-azimut-banca-mediolanum-e-finecobank","k":"pub"}],"wsi":[{"t":"Fideuram, 294 nuovi professionisti della consulenza da inizio anno","u":"https://www.wallstreetitalia.com/fideuram-294-nuovi-professionisti-della-consulenza-da-inizio-anno/","k":"pub"}]},"advisor":true,"competitors":["bluerating","wsi"],"readerSignal":"nessuno","readerEvidence":"Nessun segnale nelle ricerche: tema di settore.","note":"Advisor è l’unico con il dettaglio dei «6 reclutamenti di peso»."},{"id":"t2","label":"Come cambiano le banche-reti: Anasf, Assoreti, Efpa","category":"Reti e consulenti","coverage":{"advisor":[{"t":"Come stanno cambiando le banche-reti, secondo Conte (Anasf), Tofanelli (Assoreti) e Carluccio (Efpa)","u":"https://news.google.com/rss/articles/CBMi8wFBVV95cUxPUnIxTnZ6NEhmcFhqRlRXSkZRb3pTU3RNY1k2NjcyRmhsNmNRYlluRWVzSG5DM2F4LWVTUk9nVWk2QS1NaDlMMmN5WGVQNFk0NjVpNVlwVkFlbGFmLWhiQXNiT1dCampWeU8xaGZzM0VseVVPdUkwcFRIQnZ2bGlXZnBsb3pBN3NCMEczN2w0cjhQNkRmbXdOUnJsTExVNkExVUF4bkJSNnhQTm9QN0JoNVRLbGk0bkg4aDhBeHVvdDhlaFhuWW0tTklheEtJV2hHQV8tZ3JZYUJUMm5nSkstSkkwM18xODB2VUhiWXBERHd1Y3M?oc=5","k":"pub"}]},"advisor":true,"competitors":[],"readerSignal":"basso","readerEvidence":"Le ricerche su «consulente finanziario» cercano definizioni di base, non il dibattito associativo.","note":""},{"id":"t3","label":"Il valore del consulente: +3% l’anno secondo OCF","category":"Reti e consulenti","coverage":{"advisor":[{"t":"Marino (OCF): \"Con un consulente finanziario si guadagna fino al 3% in più all’anno\"","u":"https://advisoronline.it/consulenti-finanziari/consulenti-finanziari/marino-ocf-con-un-consulente-finanziario-si-guadagna-fino-al-3-in-piu-all-anno","k":"home"}],"wsi":[{"t":"Amundi, pensioni e investimenti: centrale la figura del consulente finanziario","u":"https://www.wallstreetitalia.com/amundi-pensioni-e-investimenti-centrale-la-figura-del-consulente-finanziario/","k":"home"}]},"advisor":true,"competitors":["wsi"],"readerSignal":"medio","readerEvidence":"Suggerimenti di ricerca: «consulente finanziario cosa fa», «indipendente», «stipendio».","note":"Buon aggancio per i social: risponde a una curiosità reale del pubblico."},{"id":"t4","label":"Fee-Only Summit e consulenza a parcella","category":"Reti e consulenti","coverage":{"advisor":[{"t":"SEVEN - La consulenza ha bisogna del credito. Più quotate più crescita. Le anticipazioni del Fee-Only Summit di questa settimana","u":"https://advisoronline.it/risparmio-gestito/risparmio-gestito/seven-la-consulenza-ha-bisogna-del-credito-piu-quotate-piu-crescita-le-anticipazioni-del-fee-only-summit-di-questa-settimana","k":"home"}]},"advisor":true,"competitors":[],"readerSignal":"basso","readerEvidence":"«consulente finanziario indipendente» è tra i suggerimenti di ricerca.","note":""},{"id":"t5","label":"Agenda eventi e formazione per consulenti","category":"Eventi e premi","coverage":{"advisor":[{"t":"Agenda del Consulente, gli appuntamenti da non perdere la prossima settimana","u":"https://advisoronline.it/consulenti-finanziari/consulenti-finanziari/agenda-del-consulente-gli-appuntamenti-da-non-perdere-la-prossima-settimana","k":"home"}],"wsi":[{"t":"Consulenti finanziari, i seminari dell’Anasf di ottobre","u":"https://www.wallstreetitalia.com/consulenti-finanziari-i-seminari-dellanasf-di-ottobre/","k":"pub"}]},"advisor":true,"competitors":["wsi"],"readerSignal":"nessuno","readerEvidence":"Nessun segnale nelle ricerche.","note":""},{"id":"t6","label":"Altri ingressi e aperture nelle reti (Widiba, Fineco, Mediolanum, Azimut, BNL)","category":"Reti e consulenti","coverage":{"bluerating":[{"t":"Banca Widiba, un bancario d’esperienza amplia la rete in Toscana","u":"https://www.bluerating.com/banche-e-reti/877478/banca-widiba-un-bancario-desperienza-amplia-la-rete-in-toscana","k":"pub"},{"t":"Banca Mediolanum, tutti i top ingressi del secondo trimestre. Entrano anche ex di Intesa, Unicredit, Ing e Banca Sella","u":"https://www.bluerating.com/banche-e-reti/873033/banca-mediolanum-tutti-i-top-ingressi-del-secondo-trimestre-entrano-anche-ex-di-intesa-unicredit-ing-e-banca-sella","k":"home"},{"t":"Bnl Bnp Paribas Wap, i magnifici 7 nuovi ingressi per la rete","u":"https://www.bluerating.com/banche-e-reti/872635/bnl-bnp-paribas-wap-i-magnifici-7-nuovi-ingressi-per-la-rete","k":"home"}],"wsi":[{"t":"Azimut inaugura il nuovo ufficio a Cagliari e rafforza la presenza in Sardegna","u":"https://www.wallstreetitalia.com/azimut-inaugura-il-nuovo-ufficio-a-cagliari-e-rafforza-la-presenza-in-sardegna/","k":"home"}]},"advisor":false,"competitors":["bluerating","wsi"],"readerSignal":"nessuno","readerEvidence":"Nessun segnale nelle ricerche.","note":"Bluerating presidia il reclutamento rete per rete; Advisor nella finestra copre solo Fideuram."},{"id":"t7","label":"Reti in Borsa: titoli di banche-reti e gestori","category":"Banche, M&A e governance","coverage":{"bluerating":[{"t":"Reti in Borsa: Banca Mediolanum allunga su tutti il passo","u":"https://www.bluerating.com/banche-e-reti/877450/reti-in-borsa-banca-mediolanum-allunga-su-tutti-il-passo-12","k":"pub"}]},"advisor":false,"competitors":["bluerating"],"readerSignal":"medio","readerEvidence":"«borsa milano oggi / in tempo reale» tra i suggerimenti di ricerca.","note":""},{"id":"t8","label":"Nuovo assetto Consob, conferma di Linciano","category":"Normativa, fisco e vigilanza","coverage":{"advisor":[{"t":"Parte la nuova Consob, conferma per Linciano. Sul tavolo nuovi strumenti finanziari e regole di governance","u":"https://advisoronline.it/asset-manager/gestori-e-mercati-finanziari/parte-la-nuova-consob-conferma-per-linciano-sul-tavolo-nuovi-strumenti-finanziari-e-regole-di-governance","k":"home"}]},"advisor":true,"competitors":[],"readerSignal":"nessuno","readerEvidence":"Nessun segnale nelle ricerche.","note":""},{"id":"t9","label":"UBS: otto banche estere avrebbero sondato una fusione","category":"Banche, M&A e governance","coverage":{"advisor":[{"t":"UBS, otto banche estere avrebbero sondato una fusione. In campo Morgan Stanley, Deutsche Bank e Standard Chartered","u":"https://advisoronline.it/private-banker/banche-private/ubs-otto-banche-estere-avrebbero-sondato-una-fusione","k":"home"}],"bluerating":[{"t":"Ubs, otto grandi banche estere valutano una possibile fusione","u":"https://www.bluerating.com/banche-e-reti/877469/ubs-otto-grandi-banche-estere-valutano-una-possibile-fusion","k":"pub"}]},"advisor":true,"competitors":["bluerating"],"readerSignal":"nessuno","readerEvidence":"Nessun segnale nelle ricerche.","note":""},{"id":"t10","label":"Banca Ifis e illimity: nuovo AD e fusione","category":"Banche, M&A e governance","coverage":{"fundspeople":[{"t":"Banca Ifis, nuovo AD e riassetto manageriale in vista della fusione con Illimity Bank","u":"https://fundspeople.com/it/banca-ifis-nuovo-ad-e-riassetto-manageriale-in-vista-della-fusione-con-illimity-bank/","k":"home"}],"bluerating":[{"t":"Banca Ifis, Zingone nuovo ceo e ok alla fusione con Illimity. Ma i rilievi di Bankitalia frenano il titolo","u":"https://forbes.it/2026/09/25/banca-ifis-zingone-nuovo-ceo-fusione-illimity-bankitalia-titolo/?utm_source=bluerating&utm_medium=rss_widget&utm_campaign=sidebar_feed","k":"home"}],"wewealth":[{"t":"Ifis e illimity, quanto peserà il wealth management dopo la fusione","u":"https://www.we-wealth.com/news/banca-ifis-illimity-wealth-management","k":"home"}]},"advisor":false,"competitors":["fundspeople","bluerating","wewealth"],"readerSignal":"nessuno","readerEvidence":"Nessun segnale nelle ricerche.","note":"Advisor lo aveva trattato il 25/09: fuori dalla finestra di questo run."},{"id":"t11","label":"MPS, Mediobanca e Intesa: le partite bancarie","category":"Banche, M&A e governance","coverage":{"bluerating":[{"t":"Mps: nella prossima assemblea si voterà anche sulla fusione con Mediobanca","u":"https://www.bluerating.com/banche-e-reti/877361/mps-nella-prossima-assemblea-si-votera-anche-sulla-fusione-con-mediobanca","k":"home"}],"wewealth":[{"t":"Intesa Sanpaolo-Mps, cosa succede dopo l’ok all’aumento di capitale","u":"https://www.we-wealth.com/news/intesa-sanpaolo-mps-cosa-succede-dopo-ok-aumento-capitale","k":"home"}]},"advisor":false,"competitors":["bluerating","wewealth"],"readerSignal":"nessuno","readerEvidence":"Nessun segnale nelle ricerche.","note":""},{"id":"t12","label":"Nomine nell’asset management e nelle SGR","category":"Nomine","coverage":{"advisor":[{"t":"Giorgio Ciocca, nuovo chief of staff di EFG Private Banking","u":"https://advisoronline.it/private-banker/private-banker/giorgio-ciocca-nuovo-chief-of-staff-di-efg-private-banking","k":"home"}],"fundspeople":[{"t":"LBP AM rafforza il team Absolute Return con due nuovi gestori","u":"https://news.google.com/rss/articles/CBMikwFBVV95cUxQNlY0N2JKRWVfbDlFWWR3dzN0S2JwWjgzRXdRdXNNaFJ4NWJuY0RpZ0NFV2o1X1p4Y0F0RXNMMk1LRFVuWmh1LVdSRG9mNDR1RE9iVmtYaEdWNlVYdk1wZXdSTHk5Z0ZGUzdSOWpkS3B4UTdaMDZJU1NReWw3cXczVzNweXM3bEJ2V0xhVS1nTTNuM3c?oc=5","k":"pub"},{"t":"Carlo Trabattoni è il nuovo CEO di Symphonia SGR","u":"https://fundspeople.com/it/carlo-trabattoni-e-il-nuovo-ceo-di-symphonia-sgr/","k":"home"}],"citywire":[{"t":"Columbia Threadneedle potenzia il team etf con due nomine","u":"https://news.google.com/rss/articles/CBMimwFBVV95cUxPcHhmUlR5MTFoR3M2UFM2YTA5aU1nWVRqMV9tMXdQZlQ4aHdNb2plLWJBNFE0SEhWNVZYZFpabHJjZGVhY0R0NG00VndhR1JFbGNsZF9BNkZwV2xJSVNqLUdYelEzUEF4bnhQem94QUw2Qko5MXZfZXhiOVJWcDVSQzJBZnlnUUk5NlZMZF9iOGNrWTdTTWFWQ1gzMA?oc=5","k":"pub"}],"wsi":[{"t":"State Street: Lamanna nuovo country head per l’Italia","u":"https://www.wallstreetitalia.com/state-street-lamanna-nuovo-country-head-per-litalia/","k":"home"}]},"advisor":true,"competitors":["fundspeople","citywire","wsi"],"readerSignal":"nessuno","readerEvidence":"Nessun segnale nelle ricerche.","note":"Tema molto frequentato da tutti: la differenza la fa la tempestività."},{"id":"t13","label":"Rendimenti dei bond al 5%: Treasury e Gilt","category":"Mercati e asset allocation","coverage":{"advisor":[{"t":"Bond, torna il 5%: Treasury, Gilt e corporate tech sfidano di nuovo i dividendi","u":"https://news.google.com/rss/articles/CBMi0gFBVV95cUxQSkZUakVUb0NXclUzLTROY2czb1ZNUEFESTlnbDhEOU9xWGNnMjZZTzdJMzJ5aHQtVG12dzIwdUt4QnZxV3NLU2lPMzluZXpjeVFtUXFjaklGOVFtMmVTX2hYYWIyX0g4SzhzNHcwY1R0d29lMnp0ckpUd0VPQzI0cnRXbmZUNG8wNS1fcndmeUh1T1c0VURqSXFsVXNEN0dxVzMzUGRqMzVXNEVSWHBoWVpHeXVSN1pzWXAtN2pkTm5YX2dreXJCcm5rZzdCcDNaU3c?oc=5","k":"pub"}],"fundspeople":[{"t":"Treasury sopra il 5%, cosa significa per l'obbligazionario e come si muovono i gestori italiani","u":"https://news.google.com/rss/articles/CBMivAFBVV95cUxNc2J4TldJTlB3a2JIb1IwOU1zelF5Y3VRQzRwSV84R0tUTnJ4RDJUZ1VTNGgyWW05Skw4VVhVUXdVZTRhTHY1S3EzTU9IYlU5LWR4elZDZktGdTdqRUg2bW1GamhMWDFIRkJwbk5IWTlDc1hQVlpIUjRacUZ1RWg3X09sb1V3S3JfbW81aDVncElGNlZaa2ZWeHJNN3FPQXhJLUxfRnlhbVRPbzRuaXBKVUxOTWd4Nkp6X0sxeQ?oc=5","k":"pub"}],"wsi":[{"t":"Treasury Usa, il rendimento del trentennale ai massimi dal 2004: cosa sta succedendo","u":"https://www.wallstreetitalia.com/treasury-usa-il-rendimento-del-trentennale-ai-massimi-dal-2004-cosa-sta-succedendo/","k":"home"}]},"advisor":true,"competitors":["fundspeople","wsi"],"readerSignal":"medio","readerEvidence":"Suggerimenti di ricerca: «btp rendimento netto», «tassi bce oggi», «mutuo tassi oggi».","note":""},{"id":"t14","label":"Intelligenza artificiale e mercati: rischi e sell-off","category":"Mercati e asset allocation","coverage":{"advisor":[{"t":"CLO e rischio AI, Janus Henderson: “L’esposizione è molto più contenuta di quanto sembri”","u":"https://advisoronline.it/risparmio-gestito/la-parola-ai-gestori/clo-e-rischio-ai-janus-henderson-l-esposizione-e-molto-piu-contenuta-di-quanto-sembri","k":"home"}],"fundspeople":[{"t":"Dopo il sell-off dell'IA, i fondamentali restano intatti?","u":"https://fundspeople.com/it/opinione/dopo-il-sell-off-dellia-i-fondamentali-restano-intatti/","k":"home"}],"wsi":[{"t":"Gundlach prepara il portafoglio a mesi difficili: “Lontano dall’IA”","u":"https://www.wallstreetitalia.com/gundlach-prepara-il-portafoglio-a-mesi-difficili-lontano-dallia/","k":"home"}]},"advisor":true,"competitors":["fundspeople","wsi"],"readerSignal":"basso","readerEvidence":"«etf semiconduttori» tra i suggerimenti di ricerca.","note":""},{"id":"t15","label":"Private debt e private market","category":"Mercati e asset allocation","coverage":{"advisor":[{"t":"Private debt, l'eccezione che traina i mercati privati","u":"https://advisoronline.it/risparmio-gestito/la-parola-ai-gestori/private-debt-l-unica-strategia-che-continua-a-raccogliere-nei-mercati-privati","k":"home"}],"fundspeople":[{"t":"Così il private credit sta diventando un mercato più maturo","u":"https://news.google.com/rss/articles/CBMikAFBVV95cUxOaHBLRzNyd0s1VWVZNzFJeEFqRnhHTWE3SC1XX1VRQmUtaVlSOElvcGp1b0czSUprcEEwSHZZNTNFeG1SUi1UNG84T2lqMjl3Q3dsTGNOZlRBbEdlc0RkNXliN2F3ZnU2cVI1eG9XV29xSWhOeHpmV3FHaTdHaHZRLUg2bkdDTFVEcXhwYkpDXzI?oc=5","k":"pub"}],"bluerating":[{"t":"Amundi, con ICG si rafforza nei private market","u":"https://www.bluerating.com/private/876804/amundi-con-icg-si-rafforza-nei-private-market?utm_source=bluerating&utm_medium=rss_widget&utm_campaign=sidebar_feed","k":"home"}]},"advisor":true,"competitors":["fundspeople","bluerating"],"readerSignal":"nessuno","readerEvidence":"Nessun segnale nelle ricerche.","note":""},{"id":"t16","label":"Rating Morningstar: i sette gestori al massimo","category":"Prodotti: fondi, ETF, certificati","coverage":{"advisor":[{"t":"Quali sono i sette gestori col massimo rating Morningstar","u":"https://advisoronline.it/asset-manager/asset-manager/quali-sono-i-sette-gestori-col-massimo-rating-morningstar","k":"home"}]},"advisor":true,"competitors":[],"readerSignal":"basso","readerEvidence":"«fondi comuni di investimento cosa sono» tra i suggerimenti: domanda di base, non di rating.","note":""},{"id":"t17","label":"Oro in discesa","category":"Mercati e asset allocation","coverage":{"bluerating":[{"t":"Commodity, oro in discesa: ecco perchè","u":"https://www.bluerating.com/mercati/877466/commodity-oro-rapida-in-discesa-ecco-perche","k":"pub"}]},"advisor":false,"competitors":["bluerating"],"readerSignal":"alto","readerEvidence":"Suggerimenti di ricerca: «oro prezzo oggi», «oro prezzo al grammo», «investire in oro», «etf oro».","note":"Tema cercato dai lettori e trattato solo da Bluerating nella finestra."},{"id":"t18","label":"BTP Valore e nuove emissioni di ottobre","category":"Prodotti: fondi, ETF, certificati","coverage":{"wewealth":[{"t":"Btp Valore raddoppia: quanto possono rendere emissioni di ottobre","u":"https://www.we-wealth.com/news/btp-valore-ottobre-2026-rendimento","k":"home"}],"wsi":[{"t":"BTP Valore, doppia emissione in arrivo il 19 ottobre","u":"https://www.wallstreetitalia.com/btp-valore-doppia-emissione-in-arrivo-il-19-ottobre/","k":"home"}],"bluerating":[{"t":"Btp Green 2038: cedola, rendimento e rischi. Tutto quello che c’è da sapere prima di investire","u":"https://forbes.it/2026/09/26/btp-green-2038-cosa-sapere-prima-di-comprarlo-sul-mercato/?utm_source=bluerating&utm_medium=rss_widget&utm_campaign=sidebar_feed","k":"home"}]},"advisor":false,"competitors":["wewealth","wsi","bluerating"],"readerSignal":"alto","readerEvidence":"Suggerimenti di ricerca: «btp 2037», «btp italia si», «btp rendimento netto».","note":"Tema da risparmiatore, ma i clienti ne chiedono ai consulenti."},{"id":"t19","label":"Nuovi ETF e mercato degli ETF","category":"Prodotti: fondi, ETF, certificati","coverage":{"bluerating":[{"t":"Banca Generali: 100 mln in tre mesi per l’Etf sulle PMI italiane","u":"https://www.bluerating.com/banche-e-reti/877499/banca-generali-100-mln-in-tre-mesi-per-letf-sulle-pmi-italiane","k":"pub"},{"t":"Da CoinShares un Etf a Piazza Affari sulle società attive nel mining di Bitcoin","u":"https://www.bluerating.com/etf/877462/da-coinshares-un-etf-a-piazza-affari-sulle-societa-attive-nel-mining-di-bitcoin","k":"pub"}],"wsi":[{"t":"Ubs lancia il primo ETF attivo sulle azioni globali","u":"https://www.wallstreetitalia.com/ubs-lancia-il-primo-etf-attivo-sulle-azioni-globali/","k":"home"}],"wewealth":[{"t":"ETF Revolution: la nuova grammatica della consulenza","u":"https://www.we-wealth.com/voices/etf-revolution-nuova-grammatica-consulenza","k":"home"}]},"advisor":false,"competitors":["bluerating","wsi","wewealth"],"readerSignal":"alto","readerEvidence":"Suggerimenti di ricerca: «investire in etf», «etf cosa sono», «etf oro», «etf bitcoin», «etf msci world».","note":"Advisor ha una sezione ETF in menu ma nessun pezzo nella finestra."},{"id":"t20","label":"Certificati ed ETP a leva","category":"Prodotti: fondi, ETF, certificati","coverage":{"bluerating":[{"t":"Da Societe Generale 39 nuovi Discount Certificate su azioni italiane ed estere","u":"https://www.bluerating.com/certificati/877519/da-societe-generale-39-nuovi-discount-certificate-su-azioni-italiane-ed-estere","k":"pub"}],"wsi":[{"t":"Leva e controllo del rischio: come funzionano i nuovi ETP targati SG","u":"https://www.wallstreetitalia.com/video/leva-e-controllo-del-rischio-come-funzionano-i-nuovi-etp-targati-sg/","k":"home"}]},"advisor":false,"competitors":["bluerating","wsi"],"readerSignal":"nessuno","readerEvidence":"Nessun segnale nelle ricerche.","note":""},{"id":"t21","label":"Flussi e raccolta del risparmio gestito","category":"Prodotti: fondi, ETF, certificati","coverage":{"fundspeople":[{"t":"Fondi globali, i flussi premiano obbligazionario ed ETF","u":"https://fundspeople.com/it/fondi-globali-nel-secondo-trimestre-i-flussi-premiano-obbligazionario-ed-etf/","k":"home"},{"t":"Nuovi fondi registrati alla vendita in Italia, sono 56 ad agosto","u":"https://fundspeople.com/it/nuovi-fondi-registrati-alla-vendita-in-italia-sono-56-ad-agosto/","k":"home"}],"wsi":[{"t":"Risparmio gestito, patrimonio record a 2.722 miliardi: raccolta a 11 miliardi nel secondo trimestre","u":"https://www.wallstreetitalia.com/risparmio-gestito-patrimonio-record-a-2-722-miliardi-raccolta-a-11-miliardi-nel-secondo-trimestre/","k":"home"}]},"advisor":false,"competitors":["fundspeople","wsi"],"readerSignal":"basso","readerEvidence":"Suggerimenti: «risparmio gestito conviene», «risparmio gestito tassazione».","note":""},{"id":"t22","label":"Longevità e gestione del patrimonio","category":"Private banking e wealth","coverage":{"fundspeople":[{"t":"Il wealth management risponde alle sfide della longevity","u":"https://fundspeople.com/it/il-wealth-management-risponde-alle-sfide-della-longevity/","k":"home"},{"t":"Rubino (UniCredit): \"I modelli di servizio tradizionali non sono adeguati alle nuove esigenze della longevity\"","u":"https://fundspeople.com/it/insights/rubino-unicredit-i-modelli-di-servizio-tradizionali-non-sono-adeguati-alle-nuove-esigenze-della-longevity/","k":"home"}],"wsi":[{"t":"Longevità: una nuova opportunità, l’editoriale di settembre 2026","u":"https://www.wallstreetitalia.com/mercati-che-fare/longevita-una-nuova-opportunita/","k":"home"}],"wewealth":[{"t":"Non solo anni, ma risorse: la sfida finanziaria di vivere più a lungo","u":"https://www.we-wealth.com/news/non-solo-anni-ma-risorse-la-sfida-finanziaria-di-vivere-piu-a-lungo","k":"home"}]},"advisor":false,"competitors":["fundspeople","wsi","wewealth"],"readerSignal":"medio","readerEvidence":"Suggerimenti di ricerca: «pensione anticipata 2026», «fondo pensione come funziona».","note":"FundsPeople ne ha fatto un tema di copertina (rivista 107 e Knowledge Hub)."},{"id":"t23","label":"Previdenza complementare e fondi pensione","category":"Previdenza e protezione","coverage":{"wewealth":[{"t":"Fondi pensione: gli italiani investono davvero nei migliori?","u":"https://www.we-wealth.com/news/fondi-pensione-migliori-rendimenti-patrimonio-masse","k":"home"}],"wsi":[{"t":"Amundi, pensioni e investimenti: centrale la figura del consulente finanziario","u":"https://www.wallstreetitalia.com/amundi-pensioni-e-investimenti-centrale-la-figura-del-consulente-finanziario/","k":"home"}]},"advisor":false,"competitors":["wewealth","wsi"],"readerSignal":"alto","readerEvidence":"Suggerimenti di ricerca: «pensione anticipata a 64 anni», «fondo pensione come funziona», «fondo pensione poste».","note":""},{"id":"t24","label":"Private banking: imprenditori, fiduciarie e passaggio generazionale","category":"Private banking e wealth","coverage":{"wsi":[{"t":"Private banking, dove investiranno i clienti imprenditori nel 2027","u":"https://www.wallstreetitalia.com/private-bankig-dove-investiranno-i-clienti-imprenditori-nel-2027/","k":"home"},{"t":"Siref Fiduciaria di Intesa supera i 100mila mandati","u":"https://www.wallstreetitalia.com/siref-fiduciaria-di-intesa-supera-i-100mila-mandati/","k":"home"}],"bluerating":[{"t":"Intesa Sanpaolo: Siref Fiduciaria supera i 110.000 mandati fiduciari","u":"https://www.bluerating.com/private/876920/intesa-sanpaolo-siref-fiduciaria-supera-i-110-000-mandati-fiduciari?utm_source=bluerating&utm_medium=rss_widget&utm_campaign=sidebar_feed","k":"home"}],"wewealth":[{"t":"Holding di famiglia, tra vantaggi fiscali e rischio di abuso","u":"https://www.we-wealth.com/news/holding-famiglia-vantaggi-fiscali-rischio-abuso","k":"home"}],"fundspeople":[{"t":"Stivella (FinecoBank): \"Banker giovani e gamma prodotti più ampia, così rispondiamo al passaggio generazionale\"","u":"https://fundspeople.com/it/insights/stivella-finecobank-banker-giovani-e-gamma-prodotti-piu-ampia-cosi-rispondiamo-al-passaggio-generazionale/","k":"home"}]},"advisor":false,"competitors":["wsi","bluerating","wewealth","fundspeople"],"readerSignal":"medio","readerEvidence":"Suggerimenti di ricerca: «successione eredità come funziona», «private banking soglia minima».","note":"Nella finestra Advisor Private non ha pezzi su questo filone."},{"id":"t25","label":"Truffe con l’intelligenza artificiale e falsi consulenti","category":"Truffe e tutela del risparmiatore","coverage":{"bluerating":[{"t":"Fideuram Ispb – Molesini: prima delle dimissioni una truffa milionaria subita con l’AI","u":"https://www.bluerating.com/banche-e-reti/877376/fideuram-ispb-molesini-prima-delle-dimissioni-una-truffa-milionaria-subita-con-lai","k":"home"},{"t":"Promette un rimborso, ma svuota il conto: finto consulente denunciato per truffa","u":"https://www.bluerating.com/banche-e-reti/877520/truffe-falso-consulente-al-telefono-conto-alleggerito-di-840-euro","k":"pub"},{"t":"Consulenza e truffe, Tre Respiri cambia passo: guida gratuita alle banche e aggiornamento ogni dicembre","u":"https://www.bluerating.com/banche-e-reti/877521/consulenza-e-truffe-tre-respiri-cambia-passo-guida-gratuita-alle-banche-e-aggiornamento-ogni-dicembre","k":"pub"}],"wsi":[{"t":"Fideuram, la truffa da 36 milioni: il falso Messina e la voce clonata con l’AI","u":"https://www.wallstreetitalia.com/fideuram-la-truffa-da-36-milioni-il-falso-messina-e-la-voce-clonata-con-lai/","k":"home"}]},"advisor":false,"competitors":["bluerating","wsi"],"readerSignal":"basso","readerEvidence":"Nessuna ricerca diretta, ma è in homepage su due testate.","note":"Angolo possibile per Advisor: come il consulente protegge cliente e reputazione."},{"id":"t26","label":"Cronaca di Borsa e analisi tecnica","category":"Mercati e asset allocation","coverage":{"bluerating":[{"t":"Fib, Dax ed Euro Stoxx 50 future respinti (per ora) dalle resistenze","u":"https://www.bluerating.com/mercati/877265/fib-dax-ed-euro-stoxx-50-future-respinti-per-ora-dalle-resistenze","k":"pub"}],"wsi":[{"t":"Borsa di Tokyo in calo: Nikkei chiude a -0,73%","u":"https://www.wallstreetitalia.com/news/borsa-di-tokyo-in-calo-nikkei-chiude-a-073/","k":"pub"},{"t":"Market mover: l’agenda macro di lunedì 28 settembre 2026","u":"https://www.wallstreetitalia.com/news/market-mover-lagenda-macro-di-lunedi-28-settembre-2026/","k":"pub"}]},"advisor":false,"competitors":["bluerating","wsi"],"readerSignal":"alto","readerEvidence":"Suggerimenti di ricerca: «borsa milano oggi», «borsa milano in tempo reale».","note":"Tema da quotidiano finanziario: non per forza nel perimetro di Advisor."},{"id":"t27","label":"Premi ed eventi delle testate","category":"Eventi e premi","coverage":{"fundspeople":[{"t":"Le immagini esclusive dei FundsPeople Italy Awards 2026","u":"https://news.google.com/rss/articles/CBMiiwFBVV95cUxPMHI5akh0NUpTYnhIa2lPbDFQZEkzbXc0djBkSWgxZTR5QUFVVjJWVk9YUDFBRlhMcmwzeG1ZTjBvd002YUt4X05nU0ZpSTZNN2NEM3RPcEEwQ2xvYkpOMkhVTWs1QjI4eE4tYkU2U2lMZEthTEQ2c3E3T1hEVzJZa0pad29KS1FIeXRj?oc=5","k":"pub"}],"wewealth":[{"t":"08 OTT IN PRESENZA LANDING.WE-WEALTH.COM ↗ III Wealth Management Summit 09:00 · Milano","u":"https://landing.we-wealth.com/wealth-management-summit-2026/","k":"home"}],"wsi":[{"t":"Il Valore dell’Assicurazione 2026, l’invito del direttore Leopoldo Gasbarro","u":"https://www.wallstreetitalia.com/video/il-valore-dellassicurazione-2026-linvito-del-direttore-leopoldo-gasbarro/","k":"home"}]},"advisor":false,"competitors":["fundspeople","wewealth","wsi"],"readerSignal":"nessuno","readerEvidence":"Nessun segnale nelle ricerche.","note":"Ogni concorrente spinge in home i propri eventi."},{"id":"t28","label":"Lusso e investimenti da passione","category":"Altro","coverage":{"wewealth":[{"t":"Rolex Swan Cup 2026: record a Porto Cervo e tutti i vincitori","u":"https://news.google.com/rss/articles/CBMib0FVX3lxTE5FX3NSR294V1RpZENIXzdhWDQ0N2FhcHBBM0hPOTg0Z3h3RnpWWjJKUFd3MGJPSzlUZ29JZVVHcV9fRFA1dmdWTEVJMEhkM0tDYVAzVThGXzRHMGdIVmpicXo5YkdhOVhzQW9NZThoNA?oc=5","k":"pub"}],"bluerating":[{"t":"Il lusso da collezione conquista i più giovani","u":"https://www.bluerating.com/private/875970/il-lusso-da-collezione-conquista-il-mercato-dei-collezionisti-dei-piu-giovani?utm_source=bluerating&utm_medium=rss_widget&utm_campaign=sidebar_feed","k":"home"}]},"advisor":false,"competitors":["wewealth","bluerating"],"readerSignal":"nessuno","readerEvidence":"Nessun segnale nelle ricerche.","note":""}],"audience":{"themes":[{"label":"Fiscal drag, la «tassa invisibile» su stipendi e pensioni","evidence":"Google Trends Italia: oltre 20.000 ricerche oggi, tra le prime tendenze del giorno.","source":"Google Trends","strength":"alto","advisorCovered":false,"competitorsCovering":[]},{"label":"Oro: prezzo e come investirci","evidence":"Suggerimenti di ricerca: «oro prezzo oggi», «oro prezzo al grammo», «investire in oro», «etf oro».","source":"Suggerimenti Google","strength":"alto","advisorCovered":false,"competitorsCovering":["bluerating"]},{"label":"ETF: cosa sono e quali scegliere","evidence":"Suggerimenti: «etf cosa sono», «etf monetari», «etf msci world», «etf oro», «etf bitcoin», «investire in etf».","source":"Suggerimenti Google","strength":"alto","advisorCovered":false,"competitorsCovering":["bluerating","wsi","wewealth"]},{"label":"BTP: nuove emissioni e rendimento netto","evidence":"Suggerimenti: «btp 2037», «btp italia si», «btp rendimento netto».","source":"Suggerimenti Google","strength":"alto","advisorCovered":false,"competitorsCovering":["wewealth","wsi","bluerating"]},{"label":"Pensione anticipata e fondi pensione","evidence":"Suggerimenti: «pensione anticipata a 64 anni», «pensione anticipata 2026/2027», «fondo pensione come funziona».","source":"Suggerimenti Google","strength":"alto","advisorCovered":false,"competitorsCovering":["wewealth","wsi"]},{"label":"Tassi BCE e mutui","evidence":"Suggerimenti: «tassi bce oggi», «tassi bce previsioni 2027», «mutuo tassi oggi».","source":"Suggerimenti Google","strength":"medio","advisorCovered":true,"competitorsCovering":["fundspeople","wsi"]},{"label":"Cosa fa un consulente finanziario","evidence":"Suggerimenti: «consulente finanziario cosa fa», «indipendente», «stipendio», «poste italiane».","source":"Suggerimenti Google","strength":"medio","advisorCovered":true,"competitorsCovering":["wsi"]},{"label":"Successione ed eredità","evidence":"Suggerimenti: «successione eredità come funziona», «tempi», «casa», «azioni».","source":"Suggerimenti Google","strength":"medio","advisorCovered":false,"competitorsCovering":["wewealth"]},{"label":"Conto deposito","evidence":"Suggerimenti: «conto deposito migliore», con i nomi delle banche.","source":"Suggerimenti Google","strength":"medio","advisorCovered":false,"competitorsCovering":[]},{"label":"Borsa di Milano in tempo reale","evidence":"Suggerimenti: «borsa milano oggi», «in tempo reale».","source":"Suggerimenti Google","strength":"medio","advisorCovered":false,"competitorsCovering":["bluerating","wsi"]}],"trends":[{"term":"rifugio brigata alpina cadore","traffic":"1000+","relevant":false,"news":[{"title":"Morsa da una vipera mentre passeggia vicino al rifugio: 53enne finisce all'ospedale","source":"Il Gazzettino"},{"title":"Donna morsa da una vipera durante un'escursione: paura in montagna","source":"il Dolomiti"}]},{"term":"paul seixas","traffic":"500+","relevant":false,"news":[{"title":"La delusione di Paul Seixas: “Un errore stupido. Non ho mai avuto i crampi in vita mia”","source":"OA Sport"},{"title":"Seixas durissimo: «È vergognoso, ho deluso i miei compagni»","source":"FantaCycling"}]},{"term":"torna la tassa invisibile stangata da 13 miliardi su stipendi e pensioni","traffic":"20000+","relevant":true,"news":[{"title":"Torna la tassa invisibile. Stangata da 13 miliardi su stipendi e pensioni","source":"la Repubblica"},{"title":"Cos’è il fiscal drag: la \"tassa invisibile\" che può pesare fino a 13 miliardi su stipendi e pensioni","source":"Tgcom24"}]},{"term":"alessandro sortino","traffic":"2000+","relevant":false,"news":[{"title":"Alessandro Sortino: «Ho lasciato le Iene perché mi sono sentito a disagio dopo le lacrime di un politico inquisito. Ora mi dedico a San Francesco»","source":"Corriere della Sera"},{"title":"Francesco per davvero (parti 3 e 4) Sabato 3 ottobre in prima serata","source":"Tv2000"}]},{"term":"mattia bellucci","traffic":"1000+","relevant":false,"news":[{"title":"Bellucci vs Peliwo • Jingshan 2026","source":"TennisTemple"},{"title":"September 29, 2026: Galloway / Goransson vs Tabilo / van Assche Tennis Prediction Market","source":"Robinhood"}]},{"term":"giovanna mezzogiorno","traffic":"200+","relevant":false,"news":[{"title":"Giovanna Mezzogiorno: “Adesso combatto il passato per vivere il presente”","source":"la Repubblica"},{"title":"Giovanna Mezzogiorno: «Ho vissuto 20 vite. Mio padre mi diceva di non montarmi la testa. I miei figli? Saranno uomini rispettosi»","source":"Il Messaggero"}]},{"term":"associazione nazionale magistrati","traffic":"1000+","relevant":false,"news":[{"title":"Sicurezza, lite Tajani-Anm: “Le toghe siano più dure”, “Attacca lo Stato di diritto”","source":"la Repubblica"},{"title":"Tajani dice che ci vorrebbe «molta più rigidità» da parte della magistratura","source":"Il Post"}]},{"term":"delitto","traffic":"2000+","relevant":false,"news":[{"title":"Delitto di Torino, la doppia vita di Nicole Formichetti: da prof modello a “Satana” del festino","source":"La Stampa"},{"title":"Ucciso e fatto a pezzi, De Oliveira dopo l'omicidio telefonò all'ex","source":"ANSA"}]},{"term":"via staggi","traffic":"200+","relevant":false,"news":[{"title":"Violento scontro frontale tra due auto: donna incastrata tra le lamiere","source":"CesenaToday"},{"title":"Scontro tra due auto in via Staggi: una ferita incastrata tra le lamiere","source":"Forlì24Ore"}]},{"term":"andre agassi","traffic":"200+","relevant":false,"news":[{"title":"Agassi scherza con Zverev: \"Ora che hai vinto uno Slam...\"","source":"Sky Sport"},{"title":"Rod Lever Cup, vince l'Europa. Siparietto fra i coach Agassi e Noah. Il francese: \"Sono un nonno\"","source":"la Repubblica"}]}],"searches":[{"seed":"consulente finanziario","suggestions":["consulente finanziario cosa fa","consulente finanziario indipendente","consulente finanziario poste italiane","consulente finanziario stipendio","consulente finanziario poste italiane stipendio","consulente finanziario in inglese","consulente finanziario autonomo","consulente finanziario poste"]},{"seed":"investire","suggestions":["investire oggi","investire sgr","investire in etf","investire in oro","investire biz","investire poste italiane","investire in azioni","investire in borsa"]},{"seed":"btp","suggestions":["btp 2037","btp italia si","btp 2072","btp 2054","btp 4 2037","btp 2051","btp 2067","btp rendimento netto"]},{"seed":"etf","suggestions":["etf cosa sono","etf monetari","etf sp500","etf oro","etf msci world","etf semiconduttori","etf obbligazionari","etf bitcoin"]},{"seed":"fondi comuni","suggestions":["fondi comuni di investimento","fondi comuni di investimento poste","fondi comuni di investimento cosa sono","fondi comuni poste","fondi comuni italiani","fondi comuni intesa san paolo","fondi comuni di investimento intesa san paolo","fondi comuni poste italiane"]},{"seed":"fondo pensione","suggestions":["fondo pensione intesa sanpaolo","fondo pensione poste","fondo pensione come funziona","fondo pensione allianz","fondo pensione bcc","fondo pensione unicredit","fondo pensione cometa","fondo pensione fonte"]},{"seed":"conto deposito","suggestions":["conto deposito migliore","conto deposito intesa san paolo","conto deposito revolut","conto deposito poste","conto deposito fineco","conto deposito mediolanum","conto deposito poste italiane","conto deposito unicredit"]},{"seed":"tassi bce","suggestions":["tassi bce oggi","tassi bce oggi a che ora","tassi bce previsioni 2027","tassi bce storico","tassi bce news","tassi bce 2026","tassi bce quando","tassi bce domani"]},{"seed":"oro prezzo","suggestions":["oro prezzo al grammo","oro prezzo oggi","oro prezzo al grammo oggi","oro prezzo grafico","oro prezzo al kg","oro prezzo oncia","oro prezzo al grammo usato","oro prezzo 18 carati"]},{"seed":"borsa milano","suggestions":["borsa milano oggi","borsa milano in tempo reale","borsa milano oggi in tempo reale","borsa milano ultima settimana","borsa milano oggi chiusa","borsa milano 9 settembre 2026","borsa milano ieri","borsa milano oggi sole 24 ore"]},{"seed":"inflazione","suggestions":["inflazione italia 2026","inflazione italia","inflazione italia oggi","inflazione oggi","inflazione significato","inflazione 2026","inflazione usa","inflazione giugno 2026"]},{"seed":"successione eredità","suggestions":["successione eredità come funziona","successione eredità giacente","successione eredità tempi","successione eredità azioni","successione eredità concorso coniuge e fratelli","successione eredità casa","successione eredità agenzia entrate","successione eredità in inglese"]},{"seed":"polizza vita","suggestions":["polizza vita poste","polizza vita come funziona","polizza vita caso morte","polizza vita mutuo","polizza vita poste italiane","polizza vita poste come funziona","polizza vita intesa san paolo","polizza vita generali"]},{"seed":"private banking","suggestions":["private banking intesa","private banking cos'è","private banking intesa san paolo","private banking unicredit","private banking generali","private banking soglia minima","private banking bnl","private banking credem"]},{"seed":"risparmio gestito","suggestions":["risparmio gestito e amministrato","risparmio gestito e amministrato differenza","risparmio gestito o amministrato","risparmio gestito mediolanum","risparmio gestito tassazione","risparmio gestito fineco","risparmio gestito conviene","risparmio gestito cos'è"]},{"seed":"bitcoin","suggestions":["bitcoin valore","bitcoin usd","bitcoin euro","bitcoin oggi","bitcoin price","bitcoin valore euro","bitcoin dollaro","bitcoin previsioni"]},{"seed":"mutuo tassi","suggestions":["mutuo tassi oggi","mutuo tassi attuali","mutuo tassi di interesse","mutuo tassi fissi oggi","mutuo tassi migliori","mutuo tassi fissi","mutuo tassi bce","mutuo tassi piu bassi"]},{"seed":"pensione anticipata","suggestions":["pensione anticipata a 64 anni","pensione anticipata contributiva","pensione anticipata donne","pensione anticipata 2026","pensione anticipata a 64 anni per tutti","pensione anticipata 2027","pensione anticipata ordinaria","pensione anticipata uomini"]}],"trendsStatus":"ok (10)"},"sources":[{"id":"advisor","name":"Advisor","own":true,"published":5,"home":12,"channels":{"latest":"ok (12 ultimi articoli)","home":"non previsto","rss":"non previsto","gnews":"ok (5 nella finestra)"}},{"id":"fundspeople","name":"FundsPeople","own":false,"published":6,"home":25,"channels":{"latest":"non previsto","home":"ok (25 titoli)","rss":"ok (0 nella finestra)","gnews":"ok (6 nella finestra)"}},{"id":"bluerating","name":"Bluerating","own":false,"published":12,"home":33,"channels":{"latest":"non previsto","home":"ok (33 titoli)","rss":"ok (12 nella finestra)","gnews":"non previsto"}},{"id":"citywire","name":"Citywire Italia","own":false,"published":1,"home":0,"channels":{"latest":"non previsto","home":"non previsto","rss":"non previsto","gnews":"ok (1 nella finestra)"}},{"id":"wewealth","name":"We Wealth","own":false,"published":1,"home":36,"channels":{"latest":"non previsto","home":"ok (36 titoli)","rss":"non previsto","gnews":"ok (1 nella finestra)"}},{"id":"wsi","name":"Wall Street Italia","own":false,"published":9,"home":42,"channels":{"latest":"non previsto","home":"ok (42 titoli)","rss":"ok (8 nella finestra)","gnews":"ok (4 nella finestra)"}},{"id":"focusrisparmio","name":"FocusRisparmio","own":false,"published":3,"home":0,"channels":{"latest":"non previsto","home":"non previsto","rss":"non previsto","gnews":"ok (3 nella finestra)"}}],"limits":["Citywire e FocusRisparmio sono letti solo tramite Google News: arrivano pochi articoli, con qualche ora di ritardo.","Il run è di lunedì mattina: la finestra di 24 ore copre soprattutto la domenica, e FundsPeople non ha pubblicato nel fine settimana.","I segnali sui lettori vengono da Google Trends e dai suggerimenti di ricerca. LinkedIn, X, Facebook e Reddit non sono accessibili senza le loro API.","I dati di lettura di Advisor (Google Analytics, piattaforma newsletter) non sono collegati: per ora «cosa leggono i nostri lettori» non è misurato.","Le homepage mostrano anche articoli più vecchi della finestra: sono segnati come «in home»."]};
+const OUTLETS = [
+  { id: 'advisor', name: 'Advisor', short: 'Advisor' },
+  { id: 'fundspeople', name: 'FundsPeople', short: 'FundsP.' },
+  { id: 'bluerating', name: 'Bluerating', short: 'Bluerat.' },
+  { id: 'citywire', name: 'Citywire Italia', short: 'Citywire' },
+  { id: 'wewealth', name: 'We Wealth', short: 'We Wealth' },
+  { id: 'wsi', name: 'Wall Street Italia', short: 'WSI' },
+  { id: 'focusrisparmio', name: 'FocusRisparmio', short: 'FocusRisp.' },
+];
+const SIG_LEVEL = { alto: 3, medio: 2, basso: 1, nessuno: 0 };
+const PENDING_KEY = 'radar-pending';
+
+const $ = (id) => document.getElementById(id);
+// Le funzioni della piattaforma arrivano tramite claude.use(); fuori da claude.ai non esistono.
+const use = async (name) => { try { return (await window.claude?.use?.(name)) ?? null; } catch { return null; } };
+const el = (tag, attrs = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'class') n.className = v;
+    else if (k === 'text') n.textContent = v;
+    else if (v !== undefined && v !== null && v !== false) n.setAttribute(k, v);
+  }
+  for (const k of kids.flat()) if (k != null) n.append(k.nodeType ? k : document.createTextNode(k));
+  return n;
+};
+const fmtTime = (iso) => new Date(iso).toLocaleString('it-IT', { weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} },
+};
+
+const state = {
+  index: SEED ? [indexRow(SEED)] : [],
+  run: SEED,
+  selected: SEED?.runId || null,
+  filter: 'all',
+  open: new Set(),
+  dbState: 'connecting',
+  triggerId: null,
+  pending: store.get(PENDING_KEY),
+};
+
+function indexRow(r) {
+  const t = r.topics || [];
+  return {
+    runId: r.runId, runAt: r.runAt, windowHours: r.windowHours, status: r.status || 'done', headline: r.headline,
+    topics: t.length,
+    onlyUs: t.filter((x) => x.advisor && !x.competitors.length).length,
+    missing: t.filter((x) => !x.advisor && x.competitors.length).length,
+    shared: t.filter((x) => x.advisor && x.competitors.length).length,
+  };
+}
+const kind = (t) => (t.advisor && !t.competitors.length ? 'only' : !t.advisor ? 'miss' : 'shared');
+const KIND_LABEL = { only: 'Solo noi', miss: 'Ci manca', shared: 'In comune' };
+
+/* ---------- Render ---------- */
+function renderStatus() {
+  const s = $('status');
+  s.replaceChildren();
+  const pills = {
+    connecting: ['off', 'Collegamento allo storico…'],
+    live: ['live', 'Storico collegato'],
+    offline: ['off', 'Storico non disponibile: vedi l’analisi inclusa nella pagina'],
+  };
+  const [cls, txt] = pills[state.dbState];
+  s.append(el('span', { class: `pill ${cls}`, text: txt }));
+  const running = state.index.find((r) => r.status === 'running');
+  if (running) s.append(el('span', { class: 'pill busy', text: `Analisi in corso, avviata ${fmtTime(running.runAt)}` }));
+  else if (state.pending) s.append(el('span', { class: 'pill busy', text: `Richiesta inviata ${fmtTime(state.pending.at)} · finestra ${state.pending.hours} ore · i risultati arrivano in 5-10 minuti` }));
+  const latest = state.index.find((r) => r.status === 'done');
+  if (latest) s.append(el('span', { text: `Ultima analisi completata: ${fmtTime(latest.runAt)}` }));
+}
+
+function renderRunSelect() {
+  const sel = $('run-select');
+  sel.replaceChildren(
+    ...state.index.map((r) =>
+      el('option', { value: r.runId, selected: r.runId === state.selected ? '' : null, text: `${fmtTime(r.runAt)} · ${r.windowHours}h${r.status === 'running' ? ' · in corso' : ''}` }),
+    ),
+  );
+  sel.disabled = state.index.length < 2;
+}
+
+function renderVerdict() {
+  const r = state.run;
+  if (!r) {
+    $('verdict-title').textContent = 'Nessuna analisi ancora disponibile. Avvia la prima.';
+    return;
+  }
+  const row = indexRow(r);
+  $('run-meta').textContent = `Analisi del ${fmtTime(r.runAt)} · articoli delle ultime ${r.windowHours} ore e homepage in quel momento`;
+  $('verdict-title').textContent = r.headline;
+  $('kpis').replaceChildren(
+    el('div', { class: 'kpi' }, el('b', { text: row.topics }), el('span', { text: 'argomenti confrontati' })),
+    el('div', { class: 'kpi only' }, el('b', { text: row.onlyUs }), el('span', { text: 'solo su Advisor' })),
+    el('div', { class: 'kpi miss' }, el('b', { text: row.missing }), el('span', { text: 'ci mancano' })),
+    el('div', { class: 'kpi shared' }, el('b', { text: row.shared }), el('span', { text: 'in comune' })),
+  );
+  const cols = [
+    ['plus', 'Cosa abbiamo in più'],
+    ['minus', 'Cosa ci manca'],
+    ['readers', 'Cosa cercano i lettori'],
+    ['actions', 'Cosa fare adesso'],
+  ];
+  $('board').replaceChildren(
+    ...cols.map(([k, title]) => el('div', { class: `col ${k}` }, el('h3', { text: title }), el('ul', {}, ...(r.summary?.[k] || []).map((s) => el('li', { text: s }))))),
+  );
+}
+
+function renderFilters() {
+  const t = state.run?.topics || [];
+  const counts = { all: t.length, only: 0, miss: 0, shared: 0, readers: t.filter((x) => SIG_LEVEL[x.readerSignal] >= 2).length };
+  t.forEach((x) => counts[kind(x)]++);
+  const defs = [['all', 'Tutti'], ['only', 'Solo noi'], ['miss', 'Ci mancano'], ['shared', 'In comune'], ['readers', 'Cercati dai lettori']];
+  $('filters').replaceChildren(
+    ...defs.map(([k, label]) => {
+      const b = el('button', { class: 'chip', type: 'button', 'aria-pressed': String(state.filter === k) }, label, el('span', { class: 'n', text: counts[k] }));
+      b.onclick = () => { state.filter = k; renderFilters(); renderMatrix(); };
+      return b;
+    }),
+  );
+}
+
+function renderMatrix() {
+  const table = $('matrix');
+  const topics = (state.run?.topics || [])
+    .filter((t) => state.filter === 'all' || (state.filter === 'readers' ? SIG_LEVEL[t.readerSignal] >= 2 : kind(t) === state.filter))
+    .slice()
+    .sort((a, b) => {
+      const order = { miss: 0, only: 1, shared: 2 };
+      return order[kind(a)] - order[kind(b)] || SIG_LEVEL[b.readerSignal] - SIG_LEVEL[a.readerSignal] || b.competitors.length - a.competitors.length;
+    });
+  const head = el('thead', {}, el('tr', {},
+    el('th', { text: 'Argomento' }),
+    el('th', { text: 'Stato' }),
+    ...OUTLETS.map((o) => el('th', { class: `o${o.id === 'advisor' ? ' us' : ''}`, title: o.name, text: o.short })),
+    el('th', { text: 'Lettori' }),
+  ));
+  const body = el('tbody');
+  if (!topics.length) body.append(el('tr', {}, el('td', { colspan: OUTLETS.length + 3, text: 'Nessun argomento per questo filtro.' })));
+  for (const t of topics) {
+    const k = kind(t);
+    const row = el('tr', { class: 'row', tabindex: '0', 'aria-expanded': String(state.open.has(t.id)) },
+      el('td', {}, el('div', { class: 'topic' }, el('b', { text: t.label }), el('small', { text: t.category }))),
+      el('td', {}, el('span', { class: `state ${k}`, text: KIND_LABEL[k] })),
+      ...OUTLETS.map((o) => {
+        const arts = t.coverage[o.id];
+        const onlyHome = arts && arts.every((a) => a.k === 'home');
+        const title = arts ? `${o.name}: ${arts.map((a) => a.t).join(' · ')}` : `${o.name}: niente`;
+        return el('td', { class: 'dot' }, el('i', { class: `d${o.id === 'advisor' ? ' us' : ''}${arts ? ' on' : ''}${onlyHome ? ' home' : ''}`, title, 'aria-label': title }));
+      }),
+      el('td', {}, el('span', { class: 'sig' }, el('span', { class: `bars l${SIG_LEVEL[t.readerSignal]}` }, el('i'), el('i'), el('i')), t.readerSignal)),
+    );
+    const toggle = () => { state.open.has(t.id) ? state.open.delete(t.id) : state.open.add(t.id); renderMatrix(); };
+    row.onclick = toggle;
+    row.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } };
+    body.append(row);
+    if (state.open.has(t.id)) {
+      const grid = el('div', { class: 'detail-grid' },
+        ...OUTLETS.filter((o) => t.coverage[o.id]).map((o) =>
+          el('div', { class: `src${o.id === 'advisor' ? ' us' : ''}` }, el('h4', { text: o.name }),
+            ...t.coverage[o.id].map((a) => el('div', {},
+              a.u ? el('a', { href: a.u, target: '_blank', rel: 'noopener', text: a.t }) : el('span', { text: a.t }),
+              el('span', { class: 'tag', text: a.k === 'home' ? 'in home' : 'pubblicato' }))))),
+      );
+      const notes = [t.note, t.readerEvidence && `Lettori: ${t.readerEvidence}`].filter(Boolean);
+      body.append(el('tr', { class: 'detail' }, el('td', { colspan: OUTLETS.length + 3 }, grid, ...notes.map((n) => el('p', { class: 'note', text: n })))));
+    }
+  }
+  table.replaceChildren(head, body);
+}
+
+function renderReaders() {
+  const a = state.run?.audience;
+  if (!a) return;
+  $('themes').replaceChildren(
+    el('div', { class: 'eyebrow', text: 'Temi che attirano i lettori adesso' }),
+    ...a.themes.map((th) => {
+      const who = th.competitorsCovering.map((id) => OUTLETS.find((o) => o.id === id)?.name).filter(Boolean);
+      return el('article', { class: 'theme' },
+        el('header', {}, el('b', { text: th.label }), el('span', { class: 'sig' }, el('span', { class: `bars l${SIG_LEVEL[th.strength]}` }, el('i'), el('i'), el('i')), th.strength)),
+        el('p', { text: th.evidence }),
+        el('div', { class: 'who' },
+          th.advisorCovered ? el('strong', { text: 'Advisor lo tratta' }) : el('strong', { class: 'no', text: 'Advisor non lo tratta' }),
+          ` · concorrenti: ${who.length ? who.join(', ') : 'nessuno'}`),
+      );
+    }),
+  );
+  $('trends').replaceChildren(
+    ...a.trends.map((t) => el('div', {},
+      el('div', { class: 'row1' }, el('b', { text: t.term }), el('span', { class: 'mono', text: t.traffic })),
+      t.relevant ? el('span', { class: 'rel', text: 'Rilevante per Advisor' }) : null,
+      t.news?.[0] ? el('small', { text: `${t.news[0].title} · ${t.news[0].source}` }) : null)),
+  );
+  if (!a.trends.length) $('trends').append(el('div', {}, el('small', { text: a.trendsStatus || 'Nessuna tendenza raccolta.' })));
+  $('seeds').replaceChildren(
+    ...a.searches.map((s) => el('div', { class: 'seed' }, el('b', { text: s.seed }), ...s.suggestions.map((x) => el('span', { text: x })))),
+  );
+}
+
+function renderSources() {
+  const r = state.run;
+  if (!r) return;
+  $('sources').replaceChildren(
+    ...r.sources.map((s) => el('div', { class: `source${s.own ? ' us' : ''}` },
+      el('b', { text: s.name }),
+      el('div', { class: 'mono', text: `${s.published} pubblicati nella finestra · ${s.home} in home` }),
+      el('dl', {}, ...Object.entries(s.channels).filter(([, v]) => v !== 'non previsto').flatMap(([k, v]) => [
+        el('dt', { text: { home: 'Homepage', rss: 'Feed RSS', gnews: 'Google News', latest: 'Ultime news' }[k] || k }),
+        el('dd', { text: v }),
+      ])))),
+  );
+  $('limits').replaceChildren(...(r.limits || []).map((l) => el('li', { text: l })));
+}
+
+function renderAll() {
+  renderStatus();
+  renderRunSelect();
+  renderVerdict();
+  renderFilters();
+  renderMatrix();
+  renderReaders();
+  renderSources();
+}
+
+/* ---------- Schede ---------- */
+for (const tab of document.querySelectorAll('.tab')) {
+  tab.onclick = () => {
+    for (const t of document.querySelectorAll('.tab')) {
+      const on = t === tab;
+      t.setAttribute('aria-selected', String(on));
+      $(t.getAttribute('aria-controls')).hidden = !on;
+    }
+    store.set('radar-tab', tab.id);
+  };
+}
+const savedTab = store.get('radar-tab');
+if (savedTab && $(savedTab)) $(savedTab).click();
+
+function showBanner(text, isError) {
+  const b = $('banner');
+  b.className = `banner${isError ? ' err' : ''}`;
+  b.textContent = text;
+  b.hidden = !text;
+}
+
+/* ---------- Storico (database dell'artifact) ---------- */
+let db = null;
+let runUnsub = null;
+function selectRun(runId) {
+  state.selected = runId;
+  state.open.clear();
+  if (!db) return;
+  runUnsub?.();
+  runUnsub = db.doc(`runs/${runId}`).onSnapshot(
+    (snap) => {
+      if (snap.exists) { state.run = snap.data(); renderAll(); }
+    },
+    () => {},
+  );
+}
+$('run-select').onchange = (e) => selectRun(e.target.value);
+
+(async () => {
+  db = await use('db');
+  if (!db) { state.dbState = 'offline'; renderStatus(); return; }
+  db.doc('config/app').onSnapshot((snap) => { state.triggerId = snap.exists ? snap.data().triggerId : null; }, () => {});
+  db.collection('runs_index').orderBy('runAt', 'desc').limit(40).onSnapshot(
+    (snap) => {
+      state.dbState = 'live';
+      const rows = snap.docs.map((d) => d.data());
+      if (rows.length) {
+        const newestDone = rows.find((r) => r.status === 'done');
+        if (state.pending && newestDone && new Date(newestDone.runAt) > new Date(state.pending.at)) {
+          state.pending = null;
+          store.del(PENDING_KEY);
+          showBanner('');
+        }
+        const follow = !state.selected || state.selected === state.index.find((r) => r.status === 'done')?.runId;
+        state.index = rows;
+        if (follow && newestDone && newestDone.runId !== state.selected) selectRun(newestDone.runId);
+        else if (!runUnsub && state.selected) selectRun(state.selected);
+      }
+      renderStatus();
+      renderRunSelect();
+    },
+    () => { state.dbState = 'offline'; renderStatus(); },
+  );
+})();
+
+/* ---------- Avvio di un nuovo run ---------- */
+const MCP_SERVER = 'Claude Code Remote';
+$('start-btn').onclick = async () => {
+  const btn = $('start-btn');
+  const hours = Number($('window-select').value);
+  if (!state.triggerId) {
+    showBanner('Il collegamento con la routine di analisi non è ancora configurato. Chiedi a Claude, nella sessione che ha creato il radar, di avviare un run.', true);
+    return;
+  }
+  const mcp = await use('mcp');
+  if (!mcp) {
+    showBanner('Questa vista non può avviare analisi. Apri il radar su claude.ai con l’account che lo ha creato.', true);
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Invio…';
+  try {
+    await mcp.callTool(MCP_SERVER, 'fire_trigger', {
+      trigger_id: state.triggerId,
+      text: `Finestra richiesta dal radar: ${hours} ore.`,
+    });
+    state.pending = { at: new Date().toISOString(), hours };
+    store.set(PENDING_KEY, state.pending);
+    showBanner(`Analisi avviata con finestra di ${hours} ore. Una sessione di Claude legge i siti e scrive qui il risultato: di solito servono 5-10 minuti. Puoi chiudere la pagina.`);
+  } catch (e) {
+    const copy = {
+      server_not_connected: 'Il connettore «Claude Code Remote» non è attivo per il tuo account: aggiungilo in claude.ai, Impostazioni → Connettori.',
+      needs_reauth: 'Il connettore «Claude Code Remote» va ricollegato: claude.ai, Impostazioni → Connettori.',
+      not_in_manifest: 'Hai negato al radar l’uso del connettore. Ricarica la pagina e consenti l’accesso per avviare le analisi.',
+      blocked_by_policy: 'La tua organizzazione non permette di avviare routine da questa pagina.',
+      tool_error: `La routine ha rifiutato l’avvio: ${e.message || 'errore non specificato'}.`,
+    };
+    showBanner(copy[e?.code] || `Avvio non riuscito (${e?.code || 'errore'}). Riprova tra qualche minuto.`, true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Avvia nuova analisi';
+    renderStatus();
+  }
+};
+
+/* ---------- Chiedi a Claude ---------- */
+let askCtl = null;
+function runDigest(r) {
+  return JSON.stringify({
+    quando: r.runAt, finestraOre: r.windowHours, verdetto: r.headline, sintesi: r.summary,
+    argomenti: r.topics.map((t) => ({
+      tema: t.label, categoria: t.category, stato: KIND_LABEL[kind(t)], lettori: t.readerSignal,
+      testate: Object.fromEntries(Object.entries(t.coverage).map(([k, v]) => [k, v.map((a) => a.t)])), nota: t.note,
+    })),
+    temiLettori: r.audience.themes, tendenze: r.audience.trends.filter((t) => t.relevant).map((t) => t.term),
+  }).slice(0, 48000);
+}
+$('stop-btn').onclick = () => askCtl?.abort();
+$('ask-btn').onclick = async () => {
+  const q = $('question').value.trim();
+  const out = $('answer');
+  if (!q || !state.run) return;
+  const sample = await use('sample');
+  if (!sample) { $('ask-note').textContent = 'In questa vista Claude non è disponibile.'; return; }
+  askCtl = new AbortController();
+  $('ask-btn').disabled = true;
+  $('stop-btn').hidden = false;
+  out.hidden = false;
+  out.textContent = 'Claude sta leggendo l’analisi…';
+  $('ask-note').textContent = '';
+  try {
+    await sample(
+      'Sei un consulente editoriale per Advisor, testata italiana per consulenti finanziari e private banker. ' +
+        'Rispondi in italiano, in modo concreto e senza toni assertivi: indica pro e contro quando proponi qualcosa. ' +
+        'Usa solo i dati dell’analisi qui sotto; se un dato manca, dillo.\n\nANALISI:\n' + runDigest(state.run) + '\n\nDOMANDA:\n' + q,
+      { signal: askCtl.signal, onText: ({ text }) => { out.textContent = text; } },
+    );
+  } catch (e) {
+    if (e?.code === 'cancelled') { out.textContent = e.text || ''; out.hidden = !e.text; }
+    else {
+      out.textContent = e?.text || '';
+      out.hidden = !e?.text;
+      $('ask-note').textContent = {
+        not_granted: 'Non hai consentito al radar di usare Claude in questa vista.',
+        rate_limited: 'Troppe richieste o limite di utilizzo raggiunto: riprova più tardi.',
+        sampling_disabled: 'Claude non è disponibile per questo account.',
+      }[e?.code] || 'Risposta interrotta. Puoi riprovare.';
+    }
+  } finally {
+    $('ask-btn').disabled = false;
+    $('stop-btn').hidden = true;
+  }
+};
+
+renderAll();
+</script>
