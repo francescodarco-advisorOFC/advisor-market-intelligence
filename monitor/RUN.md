@@ -35,6 +35,9 @@ Documenti usati dalla pagina:
 
    Scrive `monitor/out/raw-RUN_ID.json`. Dura 3-5 minuti. Se una testata
    risponde con errore il run continua: annotalo nei limiti.
+   **Un run = un solo RUN_ID.** Lancia la raccolta una volta sola e passa
+   sempre `--run-id`: se devi ripeterla, riusa lo stesso RUN_ID, così nello
+   storico non compaiono doppioni.
 
 5. **Analisi.** Leggi il file raw e scrivi `monitor/out/report-RUN_ID.json`
    seguendo lo schema sotto. È il passo che conta: fallo con cura.
