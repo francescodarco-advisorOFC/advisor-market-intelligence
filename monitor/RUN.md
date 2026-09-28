@@ -13,6 +13,7 @@ Documenti usati dalla pagina:
 | `runs_index/<runId>` | una riga per run: `runId, runAt, windowHours, status, headline, topics, onlyUs, missing, shared` |
 | `runs/<runId>` | il report completo prodotto da `finalize.mjs` |
 | `config/app` | `{ triggerId }`: la routine che il pulsante avvia |
+| `config/request` | `{ hours, at }`: finestra chiesta dall'ultimo avvio dal pulsante |
 
 `status` vale `running`, `done` o `error`.
 
@@ -22,8 +23,9 @@ Documenti usati dalla pagina:
    `francescodarco-advisorOFC/advisor-market-intelligence`, branch
    `claude/gallant-meitner-73dqpr`. Se la cartella non c'è, clonala.
 
-2. **Finestra.** Il messaggio che avvia il run può contenere
-   "Finestra richiesta dal radar: N ore". Usa N; se manca, usa 24.
+2. **Finestra.** Leggi con `ArtifactData` (azione `get`) il documento
+   `config/request`: `{hours, at}` è la richiesta fatta dal pulsante del radar.
+   Se `at` risale a meno di 30 minuti fa usa `hours`, altrimenti 24.
 
 3. **Segna il run come in corso.** Calcola `RUN_ID=$(date -u +%Y%m%d%H%M)` e
    scrivi con `ArtifactData` (azione `set`) il documento `runs_index/<RUN_ID>`

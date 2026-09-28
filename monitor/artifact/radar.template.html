@@ -626,10 +626,10 @@ $('start-btn').onclick = async () => {
   btn.disabled = true;
   btn.textContent = 'Invio…';
   try {
-    await mcp.callTool(MCP_SERVER, 'fire_trigger', {
-      trigger_id: state.triggerId,
-      text: `Finestra richiesta dal radar: ${hours} ore.`,
-    });
+    // La finestra viaggia nel database, non nel messaggio: un testo aggiunto
+    // all'avvio arriva alla sessione come secondo turno e farebbe due run.
+    if (db) await db.doc('config/request').set({ hours, at: new Date().toISOString() });
+    await mcp.callTool(MCP_SERVER, 'fire_trigger', { trigger_id: state.triggerId });
     state.pending = { at: new Date().toISOString(), hours };
     store.set(PENDING_KEY, state.pending);
     showBanner(`Analisi avviata con finestra di ${hours} ore. Una sessione di Claude legge i siti e scrive qui il risultato: di solito servono 5-10 minuti. Puoi chiudere la pagina.`);
