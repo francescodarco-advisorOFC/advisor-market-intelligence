@@ -1,9 +1,9 @@
 <title>Prova di stile ADVISOR</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
 <style>
-/* Layout: due registri del marchio ADVISOR. Rivista: testatina verticale a margine + colonne di testo. Corporate: slide 16:9 su fondo scuro. Identità a tema unico, colori sempre espliciti. */
+/* Layout: documento A4 su fondo grigio (come in Word/PDF) con testatina verticale a margine; sotto, due slide 16:9 su fondo scuro. Un solo font. Identità a tema unico: colori sempre espliciti. */
 :root {
   --advisor-red: #E53446;
   --corp-red: #BA0100;
@@ -11,182 +11,171 @@
   --black: #000000;
   --white: #FFFFFF;
   --corp-bg: #101010;
-  --page: #E9E9E9;
-  --chart-1: #282C34; --chart-2: #505864; --chart-3: #80889C; --chart-4: #C8303F; --chart-5: #A2A3A3; --chart-6: #D8D8D8;
-
-  --font-display: "Druk Text", "Anton", Impact, sans-serif;
-  --font-text: "Baskerville", "Libre Baskerville", Georgia, serif;
-  --font-ui: "Inter", "Helvetica Neue", Arial, sans-serif;
-  --font-corp: "Montserrat", Arial, sans-serif;
+  --rule-soft: #D8D8D8;
+  --desk: #E6E6E6;
+  --font: "Libre Baskerville", Baskerville, "Baskerville Old Face", Georgia, serif;
 }
 * { box-sizing: border-box; }
-body { background: var(--page); color: var(--black); font: 400 15px/1.5 var(--font-ui); }
-.outer { max-width: 1120px; margin: 0 auto; padding-inline: 16px; padding-block: 32px 56px; display: flex; flex-direction: column; gap: 40px; }
-.section-label { font: 600 13px var(--font-ui); color: var(--black); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 16px; border-bottom: 1px solid var(--black); padding-bottom: 6px; }
-.section-label span:last-child { font-weight: 300; }
+body { background: var(--desk); color: var(--black); font: 400 15px/1.6 var(--font); }
+.outer { max-width: 1080px; margin: 0 auto; padding-inline: 16px; padding-block: 32px 56px; display: flex; flex-direction: column; gap: 36px; }
+.section-label { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 16px; border-bottom: 1px solid var(--black); padding-bottom: 6px; font-size: 13px; }
+.section-label b { font-weight: 700; } .section-label i { color: var(--logo-grey); }
 
-/* ---------- Registro Rivista ---------- */
-.mag { background: var(--white); color: var(--black); }
+/* logo */
+.logo-doc { width: 168px; height: auto; display: block; }
+.logo-doc .l { fill: var(--logo-grey); } .logo-doc .o { fill: var(--advisor-red); }
+.logo-slide { width: 13cqw; height: auto; display: block; }
+.logo-slide .l, .logo-slide .o { fill: var(--white); }
 
-.logo { font-family: var(--font-ui); font-weight: 400; color: var(--logo-grey); letter-spacing: 0.02em; line-height: 1; }
-.logo .o { color: var(--advisor-red); }
-
-.cover-head { padding: 32px clamp(16px, 4vw, 40px) 24px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-.cover-head .logo { font-size: clamp(48px, 9vw, 84px); font-weight: 300; letter-spacing: 0.04em; }
-.cover-head .tagline { font: 400 11px var(--font-ui); letter-spacing: 0.06em; text-transform: uppercase; }
-.teasers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; padding: 0 clamp(16px, 4vw, 40px) 28px; }
-.teaser { border-top: 1px solid var(--black); padding-top: 10px; text-align: center; display: flex; flex-direction: column; gap: 4px; }
-.teaser b { font: 400 20px/1 var(--font-display); text-transform: uppercase; color: #3A3A3A; letter-spacing: 0.01em; }
-.teaser span { font: 300 13px/1.35 var(--font-ui); }
-@media (max-width: 640px) { .teasers { grid-template-columns: minmax(0, 1fr); } }
-
-.article { display: grid; grid-template-columns: 44px minmax(0, 1fr); border-top: 1px solid var(--black); }
+/* ---------- Documento ---------- */
+.doc { background: var(--white); color: var(--black); display: grid; grid-template-columns: 44px minmax(0, 1fr); }
 .runner {
   border-right: 1px solid var(--black);
   writing-mode: vertical-rl; transform: rotate(180deg);
   display: flex; justify-content: space-between; align-items: center;
-  padding: 24px 10px; font: 400 13px var(--font-ui);
+  padding: 28px 10px; font-size: 13px;
 }
-.runner .folio { font-weight: 700; font-size: 15px; }
-.runner .issue b { font-weight: 700; } .runner .issue { font-weight: 300; }
-.runner .rubric { font-weight: 600; font-size: 16px; }
+.runner b { font-weight: 700; }
+.runner .folio { font-weight: 700; font-size: 14px; }
 @media (max-width: 760px) {
-  .article { grid-template-columns: minmax(0, 1fr); }
+  .doc { grid-template-columns: minmax(0, 1fr); }
   .runner { writing-mode: horizontal-tb; transform: none; border-right: 0; border-bottom: 1px solid var(--black); padding: 10px 16px; flex-direction: row-reverse; flex-wrap: wrap; gap: 4px 16px; }
 }
+.page { padding: 40px clamp(16px, 5vw, 64px) 48px; display: flex; flex-direction: column; gap: 28px; min-width: 0; }
+.doc-head { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 12px 24px; }
+.doc-head .meta { font-style: italic; font-size: 13px; color: var(--logo-grey); }
 
-.article-body { padding: 36px clamp(16px, 4vw, 40px) 40px; display: flex; flex-direction: column; gap: 28px; min-width: 0; }
-.headline { font: 400 clamp(44px, 7.4vw, 92px)/0.94 var(--font-display); text-transform: uppercase; margin: 0; letter-spacing: 0.005em; text-wrap: balance; }
-.headline .key { display: block; color: var(--advisor-red); font-size: 1.32em; line-height: 0.9; }
+h1 { margin: 0; font: 400 clamp(30px, 4.6vw, 46px)/1.15 var(--font); text-wrap: balance; max-width: 22ch; }
+h1 .key { color: var(--advisor-red); }
 .byline-row { border-top: 1px solid var(--black); padding-top: 8px; display: flex; justify-content: flex-end; }
-.byline { font: 400 14px/1.3 var(--font-ui); } .byline b { font-weight: 600; }
+.byline { font-style: italic; font-size: 14px; } .byline b { font-style: normal; font-weight: 700; }
 
-.cols { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 32px; }
-.text { columns: 2 16em; column-gap: 28px; font: 400 15px/1.55 var(--font-text); hyphens: auto; }
-.text p { margin: 0 0 0.9em; }
-.text .q { font: 600 15px/1.4 var(--font-ui); margin-top: 1.3em; break-after: avoid; }
-.dropcap::first-letter { float: left; font: 400 5.4em/0.8 var(--font-display); color: var(--logo-grey); margin: 0.07em 0.1em 0 0; }
-.side { display: flex; flex-direction: column; gap: 32px; }
+.cols { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 40px; }
 @media (max-width: 760px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+.text { display: flex; flex-direction: column; gap: 14px; }
+.text p { margin: 0; max-width: 64ch; }
+.text .q { font-weight: 700; margin-top: 10px; }
+h2 { margin: 18px 0 0; font: 700 20px/1.3 var(--font); }
 
-.pull { margin: 0; font: italic 400 22px/1.4 var(--font-text); }
-.pull cite { display: block; margin-top: 8px; font-style: italic; font-size: 17px; }
+.side { display: flex; flex-direction: column; gap: 32px; }
+.pull { margin: 0; font: italic 400 20px/1.5 var(--font); }
+.pull cite { display: block; margin-top: 8px; font-size: 14px; color: var(--logo-grey); }
+.stat { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.stat .n { font: 400 92px/1 var(--font); font-variant-numeric: lining-nums; }
+.stat .n small { font-size: 0.32em; }
+.stat .cap { font-weight: 700; font-size: 14px; line-height: 1.4; max-width: 22ch; }
+.box { background: var(--black); color: var(--white); padding: 18px 18px 20px; display: flex; flex-direction: column; gap: 10px; font-size: 13.5px; line-height: 1.6; }
+.box h4 { margin: 0; align-self: flex-start; background: var(--advisor-red); font: 700 16px/1.3 var(--font); padding: 3px 9px 4px; }
+.box p { margin: 0; } .box b { font-weight: 700; }
 
-.stat { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.stat .n { font: 400 116px/0.85 var(--font-display); }
-.stat .n small { font-size: 0.3em; }
-.stat .cap { font: 600 14px/1.3 var(--font-ui); max-width: 20ch; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 520px; font-size: 14px; font-variant-numeric: lining-nums tabular-nums; }
+th { font-weight: 700; text-align: left; border-bottom: 1px solid var(--black); padding: 8px 14px 8px 0; }
+td { border-bottom: 1px solid var(--rule-soft); padding: 9px 14px 9px 0; }
+.num { text-align: right; }
+td.neg { color: var(--advisor-red); }
+.caption { font-style: italic; font-size: 12px; color: var(--logo-grey); margin: 0; }
+.doc-foot { border-top: 1px solid var(--black); padding-top: 8px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; }
+.doc-foot b { font-weight: 700; }
 
-.box { background: var(--black); color: var(--white); padding: 18px 18px 20px; display: flex; flex-direction: column; gap: 12px; font: 300 14px/1.5 var(--font-ui); }
-.box h4 { margin: 0; align-self: flex-start; background: var(--advisor-red); color: var(--white); font: 600 20px/1.2 var(--font-ui); padding: 2px 8px 4px; }
-.box p { margin: 0; } .box b { font-weight: 600; }
-
-/* ---------- Registro Corporate ---------- */
+/* ---------- Slide ---------- */
 .slides { display: flex; flex-direction: column; gap: 24px; }
-.slide {
-  container-type: inline-size;
-  position: relative; overflow: hidden;
-  aspect-ratio: 16 / 9; max-width: 100%;
-  background: var(--corp-bg); color: var(--white);
-  font-family: var(--font-corp);
-}
+.slide { container-type: inline-size; position: relative; overflow: hidden; aspect-ratio: 16 / 9; max-width: 100%; background: var(--corp-bg); color: var(--white); font-family: var(--font); }
 .slide::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 0.9cqw; background: var(--corp-red); }
 .slide .ring { position: absolute; left: -3.2cqw; top: 3.4cqw; width: 6.4cqw; height: 6.4cqw; border: 1.5cqw solid var(--corp-red); border-radius: 50%; }
-.slide .slogo { position: absolute; right: 2.6cqw; top: 2cqw; font: 400 2.2cqw/1 var(--font-ui); letter-spacing: 0.04em; color: var(--white); }
-.slide .pnum { position: absolute; right: 2.6cqw; bottom: 1.6cqw; font: 400 1.1cqw var(--font-corp); color: #9A9A9A; }
+.slide .slogo { position: absolute; right: 2.8cqw; top: 2.4cqw; }
+.slide .pnum { position: absolute; right: 2.8cqw; bottom: 1.6cqw; font-size: 1.1cqw; color: #9A9A9A; }
 .slide .inner { position: absolute; inset: 3cqw 5cqw 4cqw 6.2cqw; display: grid; grid-template-columns: 1.1fr 1fr; gap: 4cqw; }
-.slide h2 { margin: 0; font: 600 4.4cqw/1.05 var(--font-corp); }
-.slide .sub { font: 400 2.1cqw/1.25 var(--font-corp); margin: 0.4cqw 0 1.6cqw; }
-.slide p { margin: 0; font: 400 1.65cqw/1.4 var(--font-corp); }
+.slide h2 { margin: 0; font: 400 4.2cqw/1.1 var(--font); }
+.slide .sub { font-size: 2cqw; line-height: 1.3; margin: 0.6cqw 0 1.6cqw; }
+.slide p { margin: 0; font-size: 1.55cqw; line-height: 1.5; }
 .slide p b { font-weight: 700; }
-.slide .bh { font: 600 2.1cqw var(--font-corp); border-bottom: 0.35cqw solid var(--corp-red); padding: 0 0 0.4cqw 1.2cqw; margin: 1.6cqw 0 1cqw; }
+.slide .bh { font: 700 1.9cqw var(--font); border-bottom: 0.35cqw solid var(--corp-red); padding: 0 0 0.4cqw 1.2cqw; margin: 1.6cqw 0 1cqw; }
 .tagrow { display: flex; align-items: center; gap: 1.2cqw; margin-bottom: 0.7cqw; }
-.tag { flex: 1; background: var(--corp-red); font: 700 1.7cqw var(--font-corp); text-transform: uppercase; padding: 0.9cqw 1.4cqw; border-radius: 0 0.8cqw 0.8cqw 0; }
-.ord { font: 700 4.4cqw/1 var(--font-corp); white-space: nowrap; }
-.ord sup { font-size: 0.55em; } .ord small { font: 400 1.4cqw var(--font-corp); margin-left: 0.3cqw; }
-.dots { list-style: none; margin: 0; padding: 0 0 0 2cqw; display: flex; flex-direction: column; gap: 0.6cqw; font: 400 1.7cqw var(--font-corp); }
+.tag { flex: 1; background: var(--corp-red); font: 700 1.5cqw var(--font); text-transform: uppercase; letter-spacing: 0.02em; padding: 0.9cqw 1.4cqw; border-radius: 0 0.8cqw 0.8cqw 0; }
+.ord { font: 700 4cqw/1 var(--font); white-space: nowrap; font-variant-numeric: lining-nums; }
+.ord sup { font-size: 0.5em; } .ord small { font: 400 1.3cqw var(--font); margin-left: 0.3cqw; }
+.dots { list-style: none; margin: 0; padding: 0 0 0 2cqw; display: flex; flex-direction: column; gap: 0.6cqw; font-size: 1.6cqw; }
 .dots li { position: relative; padding-left: 2.4cqw; }
-.dots li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 0.8cqw; height: 0.8cqw; border-radius: 50%; background: var(--corp-red); }
-.callout { position: relative; margin: 1.8cqw 0 0 1cqw; background: var(--white); color: var(--corp-red); font: 700 1.6cqw/1.3 var(--font-corp); text-align: center; padding: 1cqw 2cqw; border-radius: 0 0 1cqw 0; }
+.dots li::before { content: ""; position: absolute; left: 0; top: 0.5em; width: 0.8cqw; height: 0.8cqw; border-radius: 50%; background: var(--corp-red); }
+.callout { position: relative; margin: 1.8cqw 0 0 1cqw; background: var(--white); color: var(--corp-red); font: 700 1.5cqw/1.35 var(--font); text-align: center; padding: 1cqw 2cqw; border-radius: 0 0 1cqw 0; }
 .callout::before { content: ""; position: absolute; left: -1cqw; top: -1.2cqw; border-left: 2cqw solid var(--corp-red); border-top: 1.4cqw solid transparent; border-bottom: 1.4cqw solid transparent; }
-
-.photo { margin-top: 5cqw; border-radius: 1.4cqw; background:
-  linear-gradient(180deg, rgba(16,16,16,0) 40%, rgba(16,16,16,.55)),
-  repeating-linear-gradient(90deg, #2A2A2A 0 2px, #222 2px 7cqw),
-  #262626; display: flex; align-items: flex-end; padding: 1.4cqw; font: 400 1.2cqw var(--font-corp); color: #BDBDBD; min-height: 0; }
-
-/* donut slide */
-.donut-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 3cqw; align-items: center; height: 100%; }
+.photo { margin-top: 5cqw; border-radius: 1.4cqw; background: linear-gradient(180deg, rgba(16,16,16,0) 40%, rgba(16,16,16,.55)), repeating-linear-gradient(90deg, #2A2A2A 0 2px, #222 2px 7cqw), #262626; display: flex; align-items: flex-end; padding: 1.4cqw; font-style: italic; font-size: 1.2cqw; color: #BDBDBD; }
+.donut-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 3cqw; align-items: center; }
 .donut { width: 100%; max-width: 30cqw; height: auto; display: block; }
-.legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1.5cqw; font: 400 1.8cqw var(--font-corp); }
+.legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1.4cqw; font-size: 1.7cqw; font-variant-numeric: lining-nums; }
 .legend li { display: flex; align-items: center; gap: 1.4cqw; }
 .legend i { width: 1.8cqw; height: 1.8cqw; flex: none; }
-.arrow-banner { background: #D8D8D8; color: var(--black); font: 400 1.9cqw/1.25 var(--font-corp); padding: 1.4cqw 5cqw 1.4cqw 2cqw; clip-path: polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%); margin-bottom: 2cqw; }
+.arrow-banner { background: #D8D8D8; color: var(--black); font-size: 1.8cqw; line-height: 1.3; padding: 1.4cqw 5cqw 1.4cqw 2cqw; clip-path: polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%); margin-bottom: 2cqw; }
 
-.note { font: 300 13px/1.5 var(--font-ui); color: #444; }
-.note b { font-weight: 600; }
-a { color: inherit; }
+.note { font-size: 13px; color: #444; margin: 0; }
 :focus-visible { outline: 2px solid var(--advisor-red); outline-offset: 2px; }
 </style>
 
 <div class="outer">
+  <div class="section-label"><b>Documenti — Word, PDF, report</b><i>Contenuti e dati di esempio</i></div>
 
-  <div class="section-label"><span>Registro Rivista — documenti, report, pagine</span><span>Contenuti e dati di esempio</span></div>
-
-  <article class="mag">
-    <header class="cover-head">
-      <div class="logo" aria-label="ADVISOR">ADVIS<span class="o">O</span>R</div>
-      <div class="tagline">Newsmagazine della consulenza finanziaria</div>
-    </header>
-    <div class="teasers">
-      <div class="teaser"><b>Consulenza indipendente</b><span>Le masse fee-only superano<br>i 48 miliardi</span></div>
-      <div class="teaser"><b>Reti a confronto</b><span>Chi cresce e chi rallenta<br>nel primo semestre</span></div>
-      <div class="teaser"><b>Nuovi clienti</b><span>Il passaggio generazionale<br>cambia la domanda</span></div>
+  <article class="doc">
+    <div class="runner">
+      <span class="folio">3</span>
+      <span><b>ADVISOR</b> Market Intelligence · ottobre 2026</span>
+      <span><b>Nota di mercato</b></span>
     </div>
+    <div class="page">
+      <header class="doc-head">
+        <svg class="logo-doc" viewBox="174.5 41.6 284.6 50.2" role="img" aria-label="ADVISOR"><path class="l" d="M 221.488281 90.195312 L 200.4375 42.976562 L 195.710938 42.976562 L 175.546875 90.195312 L 182.453125 90.195312 L 188.320312 76.28125 L 208.351562 76.28125 L 214.605469 90.195312 Z M 205.585938 70.300781 L 190.988281 70.300781 L 198.011719 53.292969 Z M 205.585938 70.300781"/><path class="l" d="M 269.847656 66.738281 C 269.847656 62.347656 268.75 58.289062 266.554688 54.570312 C 264.359375 50.851562 261.402344 48.035156 257.683594 46.117188 C 253.964844 44.203125 248.910156 43.246094 242.523438 43.246094 L 226.695312 43.246094 L 226.695312 90.128906 L 241.550781 90.128906 C 245.71875 90.128906 248.542969 90.011719 250.019531 89.773438 C 251.5 89.539062 253.121094 89.074219 254.894531 88.378906 C 257.917969 87.238281 260.574219 85.546875 262.859375 83.304688 C 265.097656 81.132812 266.824219 78.613281 268.035156 75.742188 C 269.242188 72.875 269.847656 69.875 269.847656 66.738281 M 262.890625 66.367188 C 262.890625 71.5 261.234375 75.742188 257.917969 79.105469 C 256.886719 80.136719 255.75 81.003906 254.507812 81.707031 C 253.261719 82.414062 251.710938 82.996094 249.851562 83.457031 C 247.992188 83.917969 245.382812 84.144531 242.019531 84.144531 L 233.417969 84.144531 L 233.417969 49.226562 L 241.820312 49.226562 C 245.046875 49.226562 247.386719 49.351562 248.84375 49.597656 C 250.300781 49.84375 251.839844 50.347656 253.464844 51.109375 C 255.089844 51.871094 256.527344 52.847656 257.785156 54.03125 C 261.1875 57.214844 262.890625 61.324219 262.890625 66.367188"/><path class="l" d="M 290.535156 76.214844 L 276.414062 43.246094 L 269.644531 43.246094 L 289.878906 90.394531 L 291.402344 90.394531 L 311.253906 43.246094 L 304.558594 43.246094 Z M 290.535156 76.214844"/><path class="l" d="M 316.460938 90.195312 L 323.183594 90.195312 L 323.183594 43.246094 L 316.460938 43.246094 Z M 316.460938 90.195312"/><path class="l" d="M 351.414062 78.65625 C 351.414062 80.417969 350.710938 81.886719 349.3125 83.058594 C 347.914062 84.230469 346.160156 84.816406 344.054688 84.816406 C 339.28125 84.816406 335.082031 82.519531 331.449219 77.917969 L 331.449219 86.457031 C 335.257812 89.308594 339.484375 90.730469 344.121094 90.730469 C 348.152344 90.730469 351.429688 89.554688 353.949219 87.203125 C 356.472656 84.851562 357.730469 81.792969 357.730469 78.027344 C 357.730469 72.742188 354.867188 68.386719 349.140625 64.96875 L 344.007812 61.929688 C 341.703125 60.578125 340.03125 59.289062 338.992188 58.0625 C 337.953125 56.835938 337.433594 55.519531 337.433594 54.113281 C 337.433594 52.527344 338.140625 51.226562 339.550781 50.210938 C 340.960938 49.195312 342.765625 48.6875 344.960938 48.6875 C 348.859375 48.6875 352.5 50.316406 355.882812 53.570312 L 355.882812 45.941406 C 352.613281 43.742188 349.015625 42.640625 345.09375 42.640625 C 340.996094 42.640625 337.660156 43.792969 335.097656 46.101562 C 332.53125 48.410156 331.25 51.410156 331.25 55.109375 C 331.25 57.574219 331.925781 59.75 333.28125 61.644531 C 334.636719 63.539062 336.917969 65.464844 340.121094 67.417969 L 345.230469 70.523438 C 349.351562 73.085938 351.414062 75.796875 351.414062 78.65625"/><path class="o" d="M 413.519531 66.738281 C 413.519531 59.8125 411.105469 54.054688 406.28125 49.460938 C 401.457031 44.871094 395.417969 42.574219 388.164062 42.574219 C 380.910156 42.574219 374.910156 44.871094 370.160156 49.460938 C 365.414062 54.054688 363.042969 59.859375 363.042969 66.871094 C 363.042969 73.707031 365.398438 79.390625 370.109375 83.925781 C 374.824219 88.464844 380.71875 90.730469 387.792969 90.730469 C 395.203125 90.730469 401.34375 88.464844 406.214844 83.925781 C 411.085938 79.390625 413.519531 73.660156 413.519531 66.738281 M 406.597656 66.601562 C 406.597656 71.710938 404.84375 75.980469 401.34375 79.40625 C 397.839844 82.835938 393.46875 84.550781 388.230469 84.550781 C 383.015625 84.550781 378.671875 82.867188 375.203125 79.507812 C 371.734375 76.148438 370 71.933594 370 66.871094 C 370 61.652344 371.726562 57.359375 375.1875 54 C 378.644531 50.640625 383.058594 48.957031 388.433594 48.957031 C 393.535156 48.957031 397.839844 50.65625 401.34375 54.050781 C 404.84375 57.445312 406.597656 61.628906 406.597656 66.601562"/><path class="l" d="M 458.183594 90.195312 L 455.695312 86.832031 C 454.710938 85.488281 453.402344 83.484375 451.765625 80.816406 C 449.167969 76.582031 447.148438 73.613281 445.714844 71.914062 C 444.28125 70.210938 442.8125 68.867188 441.3125 67.878906 C 443.867188 66.894531 445.828125 65.402344 447.195312 63.410156 C 448.5625 61.414062 449.246094 59.050781 449.246094 56.320312 C 449.246094 52.308594 447.847656 49.125 445.058594 46.773438 C 442.269531 44.421875 438.5 43.246094 433.753906 43.246094 L 421.988281 43.246094 L 421.988281 90.195312 L 428.710938 90.195312 L 428.710938 69.761719 L 430.460938 69.761719 C 432.660156 69.761719 434.222656 70.011719 435.152344 70.515625 C 436.085938 71.019531 437.128906 71.839844 438.28125 72.980469 C 439.4375 74.121094 440.710938 75.65625 442.097656 77.585938 L 444.34375 81.25 L 446.425781 84.679688 L 447.734375 86.527344 C 447.9375 86.796875 448.070312 86.988281 448.136719 87.101562 L 450.1875 90.195312 Z M 441.230469 60.265625 C 440.523438 61.445312 439.539062 62.324219 438.273438 62.90625 C 437.007812 63.488281 434.667969 63.777344 431.265625 63.777344 L 428.710938 63.777344 L 428.710938 48.957031 L 430.726562 48.957031 C 434.019531 48.957031 436.378906 49.203125 437.800781 49.699219 C 439.222656 50.191406 440.328125 51.039062 441.113281 52.234375 C 441.894531 53.433594 442.289062 54.773438 442.289062 56.25 C 442.289062 57.753906 441.933594 59.089844 441.230469 60.265625"/></svg>
+        <span class="meta">Nota di mercato n. 14 · ottobre 2026</span>
+      </header>
 
-    <div class="article">
-      <div class="runner">
-        <span class="folio">14</span>
-        <span class="issue"><b>ADVISOR</b> ottobre 2026</span>
-        <span class="rubric">Mercato</span>
-      </div>
+      <h1>Masse, clienti, parcelle: la consulenza fee&#8209;only <span class="key">esce dalla nicchia</span></h1>
+      <div class="byline-row"><span class="byline">di <b>Redazione Market Intelligence</b></span></div>
 
-      <div class="article-body">
-        <h1 class="headline">Masse, clienti, parcelle: la consulenza fee-only <span class="key">esce dalla nicchia</span></h1>
-        <div class="byline-row"><span class="byline">di <b>Redazione<br>Market Intelligence</b></span></div>
+      <div class="cols">
+        <div class="text">
+          <p>Nel 2026 le masse seguite dai consulenti indipendenti crescono a doppia cifra, a fronte di un risparmio gestito sostanzialmente piatto. La spinta arriva da due direzioni: i clienti che lasciano le reti bancarie dopo un passaggio generazionale e i professionisti che escono dalle reti per aprire uno studio proprio.</p>
+          <p>Il fenomeno non è più confinato a Milano. Veneto ed Emilia-Romagna mostrano i tassi di crescita più alti, sostenuti da imprenditori che chiedono una consulenza slegata dal prodotto.</p>
+          <p class="q">Quanto pesa ancora la tariffa nella scelta del consulente?</p>
+          <p>Meno di quanto si pensasse. La parcella media scende di pochi punti base, segno che il valore percepito sta nel servizio e non nel prezzo. I clienti tra 250 mila e un milione di euro restano il segmento più dinamico.</p>
 
-        <div class="cols">
-          <div class="text">
-            <p class="dropcap">Nel 2026 le masse seguite da consulenti indipendenti crescono a doppia cifra, a fronte di un risparmio gestito sostanzialmente piatto. La spinta arriva da due direzioni: i clienti che lasciano le reti bancarie dopo un passaggio generazionale e i professionisti che escono dalle reti per aprire uno studio proprio.</p>
-            <p>Il fenomeno non è più confinato a Milano. Veneto ed Emilia-Romagna mostrano i tassi di crescita più alti, sostenuti da un tessuto di imprenditori che chiede una consulenza slegata dal prodotto.</p>
-            <p class="q">Quanto pesa ancora la tariffa nella scelta del consulente?</p>
-            <p>Meno di quanto si pensasse. La parcella media scende di pochi punti base, segno che il valore percepito sta nel servizio e non nel prezzo. I clienti tra 250 mila e un milione di euro restano il segmento più dinamico.</p>
-            <p class="q">Quali sono i rischi per il settore?</p>
-            <p>La scala resta il nodo principale: molti studi sono piccoli e faticano a investire in tecnologia e ricerca. Le aggregazioni tra studi saranno il tema dei prossimi due anni.</p>
+          <h2>Primi cinque operatori per masse</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Operatore</th><th>Sede</th><th class="num">Masse (€ mln)</th><th class="num">Var. a/a</th><th class="num">Quota</th></tr></thead>
+              <tbody>
+                <tr><td>Studio Aurelio Partners</td><td>Milano</td><td class="num">3.420</td><td class="num">+14,2%</td><td class="num">7,0%</td></tr>
+                <tr><td>Fiducia &amp; Metodo</td><td>Roma</td><td class="num">2.180</td><td class="num">+9,8%</td><td class="num">4,5%</td></tr>
+                <tr><td>Nordest Advisory</td><td>Padova</td><td class="num">1.640</td><td class="num">+18,1%</td><td class="num">3,4%</td></tr>
+                <tr><td>Capitale Consapevole</td><td>Bologna</td><td class="num">1.210</td><td class="num neg">−2,3%</td><td class="num">2,5%</td></tr>
+                <tr><td>Sabauda Consulenza</td><td>Torino</td><td class="num">980</td><td class="num">+6,5%</td><td class="num">2,0%</td></tr>
+              </tbody>
+            </table>
           </div>
-
-          <div class="side">
-            <blockquote class="pull">“Il cliente nuovo non cerca un prodotto. Cerca qualcuno che gli dica cosa non comprare”.<cite>Parola di un consulente indipendente intervistato</cite></blockquote>
-            <div class="stat">
-              <span class="n">12<small>%</small></span>
-              <span class="cap">La crescita annua delle masse in consulenza fee-only</span>
-            </div>
-            <div class="box">
-              <h4>Metodo</h4>
-              <p>Le cifre di questa pagina sono <b>dati di esempio</b> usati per mostrare lo stile. Nei report reali qui va la nota su fonti, perimetro e periodo di rilevazione.</p>
-            </div>
-          </div>
+          <p class="caption">Fonte: elaborazione su dati di esempio. Operatori inventati.</p>
         </div>
+
+        <aside class="side">
+          <blockquote class="pull">“Il cliente nuovo non cerca un prodotto. Cerca qualcuno che gli dica cosa non comprare”.<cite>Un consulente indipendente intervistato</cite></blockquote>
+          <div class="stat">
+            <span class="n">12<small>%</small></span>
+            <span class="cap">La crescita annua delle masse in consulenza fee-only</span>
+          </div>
+          <div class="box">
+            <h4>Metodo</h4>
+            <p>Le cifre di questa pagina sono <b>dati di esempio</b>. Nei report reali qui va la nota su fonti, perimetro e periodo di rilevazione.</p>
+          </div>
+        </aside>
       </div>
+
+      <footer class="doc-foot"><span><b>ADVISOR</b> Market Intelligence</span><span>Pagina 3 di 12</span></footer>
     </div>
   </article>
 
-  <div class="section-label"><span>Registro Corporate — presentazioni</span><span>Slide 16:9</span></div>
+  <div class="section-label"><b>Presentazioni — PowerPoint 16:9</b><i>Stesso font, fondo scuro</i></div>
 
   <div class="slides">
-    <section class="slide" aria-label="Slide di esempio: I nostri servizi">
+    <section class="slide" aria-label="Slide di esempio: Market Intelligence">
       <span class="ring" aria-hidden="true"></span>
-      <span class="slogo">ADVISOR</span>
+      <span class="slogo"><svg class="logo-slide" viewBox="174.5 41.6 284.6 50.2" role="img" aria-label="ADVISOR"><path class="l" d="M 221.488281 90.195312 L 200.4375 42.976562 L 195.710938 42.976562 L 175.546875 90.195312 L 182.453125 90.195312 L 188.320312 76.28125 L 208.351562 76.28125 L 214.605469 90.195312 Z M 205.585938 70.300781 L 190.988281 70.300781 L 198.011719 53.292969 Z M 205.585938 70.300781"/><path class="l" d="M 269.847656 66.738281 C 269.847656 62.347656 268.75 58.289062 266.554688 54.570312 C 264.359375 50.851562 261.402344 48.035156 257.683594 46.117188 C 253.964844 44.203125 248.910156 43.246094 242.523438 43.246094 L 226.695312 43.246094 L 226.695312 90.128906 L 241.550781 90.128906 C 245.71875 90.128906 248.542969 90.011719 250.019531 89.773438 C 251.5 89.539062 253.121094 89.074219 254.894531 88.378906 C 257.917969 87.238281 260.574219 85.546875 262.859375 83.304688 C 265.097656 81.132812 266.824219 78.613281 268.035156 75.742188 C 269.242188 72.875 269.847656 69.875 269.847656 66.738281 M 262.890625 66.367188 C 262.890625 71.5 261.234375 75.742188 257.917969 79.105469 C 256.886719 80.136719 255.75 81.003906 254.507812 81.707031 C 253.261719 82.414062 251.710938 82.996094 249.851562 83.457031 C 247.992188 83.917969 245.382812 84.144531 242.019531 84.144531 L 233.417969 84.144531 L 233.417969 49.226562 L 241.820312 49.226562 C 245.046875 49.226562 247.386719 49.351562 248.84375 49.597656 C 250.300781 49.84375 251.839844 50.347656 253.464844 51.109375 C 255.089844 51.871094 256.527344 52.847656 257.785156 54.03125 C 261.1875 57.214844 262.890625 61.324219 262.890625 66.367188"/><path class="l" d="M 290.535156 76.214844 L 276.414062 43.246094 L 269.644531 43.246094 L 289.878906 90.394531 L 291.402344 90.394531 L 311.253906 43.246094 L 304.558594 43.246094 Z M 290.535156 76.214844"/><path class="l" d="M 316.460938 90.195312 L 323.183594 90.195312 L 323.183594 43.246094 L 316.460938 43.246094 Z M 316.460938 90.195312"/><path class="l" d="M 351.414062 78.65625 C 351.414062 80.417969 350.710938 81.886719 349.3125 83.058594 C 347.914062 84.230469 346.160156 84.816406 344.054688 84.816406 C 339.28125 84.816406 335.082031 82.519531 331.449219 77.917969 L 331.449219 86.457031 C 335.257812 89.308594 339.484375 90.730469 344.121094 90.730469 C 348.152344 90.730469 351.429688 89.554688 353.949219 87.203125 C 356.472656 84.851562 357.730469 81.792969 357.730469 78.027344 C 357.730469 72.742188 354.867188 68.386719 349.140625 64.96875 L 344.007812 61.929688 C 341.703125 60.578125 340.03125 59.289062 338.992188 58.0625 C 337.953125 56.835938 337.433594 55.519531 337.433594 54.113281 C 337.433594 52.527344 338.140625 51.226562 339.550781 50.210938 C 340.960938 49.195312 342.765625 48.6875 344.960938 48.6875 C 348.859375 48.6875 352.5 50.316406 355.882812 53.570312 L 355.882812 45.941406 C 352.613281 43.742188 349.015625 42.640625 345.09375 42.640625 C 340.996094 42.640625 337.660156 43.792969 335.097656 46.101562 C 332.53125 48.410156 331.25 51.410156 331.25 55.109375 C 331.25 57.574219 331.925781 59.75 333.28125 61.644531 C 334.636719 63.539062 336.917969 65.464844 340.121094 67.417969 L 345.230469 70.523438 C 349.351562 73.085938 351.414062 75.796875 351.414062 78.65625"/><path class="o" d="M 413.519531 66.738281 C 413.519531 59.8125 411.105469 54.054688 406.28125 49.460938 C 401.457031 44.871094 395.417969 42.574219 388.164062 42.574219 C 380.910156 42.574219 374.910156 44.871094 370.160156 49.460938 C 365.414062 54.054688 363.042969 59.859375 363.042969 66.871094 C 363.042969 73.707031 365.398438 79.390625 370.109375 83.925781 C 374.824219 88.464844 380.71875 90.730469 387.792969 90.730469 C 395.203125 90.730469 401.34375 88.464844 406.214844 83.925781 C 411.085938 79.390625 413.519531 73.660156 413.519531 66.738281 M 406.597656 66.601562 C 406.597656 71.710938 404.84375 75.980469 401.34375 79.40625 C 397.839844 82.835938 393.46875 84.550781 388.230469 84.550781 C 383.015625 84.550781 378.671875 82.867188 375.203125 79.507812 C 371.734375 76.148438 370 71.933594 370 66.871094 C 370 61.652344 371.726562 57.359375 375.1875 54 C 378.644531 50.640625 383.058594 48.957031 388.433594 48.957031 C 393.535156 48.957031 397.839844 50.65625 401.34375 54.050781 C 404.84375 57.445312 406.597656 61.628906 406.597656 66.601562"/><path class="l" d="M 458.183594 90.195312 L 455.695312 86.832031 C 454.710938 85.488281 453.402344 83.484375 451.765625 80.816406 C 449.167969 76.582031 447.148438 73.613281 445.714844 71.914062 C 444.28125 70.210938 442.8125 68.867188 441.3125 67.878906 C 443.867188 66.894531 445.828125 65.402344 447.195312 63.410156 C 448.5625 61.414062 449.246094 59.050781 449.246094 56.320312 C 449.246094 52.308594 447.847656 49.125 445.058594 46.773438 C 442.269531 44.421875 438.5 43.246094 433.753906 43.246094 L 421.988281 43.246094 L 421.988281 90.195312 L 428.710938 90.195312 L 428.710938 69.761719 L 430.460938 69.761719 C 432.660156 69.761719 434.222656 70.011719 435.152344 70.515625 C 436.085938 71.019531 437.128906 71.839844 438.28125 72.980469 C 439.4375 74.121094 440.710938 75.65625 442.097656 77.585938 L 444.34375 81.25 L 446.425781 84.679688 L 447.734375 86.527344 C 447.9375 86.796875 448.070312 86.988281 448.136719 87.101562 L 450.1875 90.195312 Z M 441.230469 60.265625 C 440.523438 61.445312 439.539062 62.324219 438.273438 62.90625 C 437.007812 63.488281 434.667969 63.777344 431.265625 63.777344 L 428.710938 63.777344 L 428.710938 48.957031 L 430.726562 48.957031 C 434.019531 48.957031 436.378906 49.203125 437.800781 49.699219 C 439.222656 50.191406 440.328125 51.039062 441.113281 52.234375 C 441.894531 53.433594 442.289062 54.773438 442.289062 56.25 C 442.289062 57.753906 441.933594 59.089844 441.230469 60.265625"/></svg></span>
       <span class="pnum">12</span>
       <div class="inner">
         <div>
@@ -204,14 +193,14 @@ a { color: inherit; }
       </div>
     </section>
 
-    <section class="slide" aria-label="Slide di esempio: grafico a ciambella">
+    <section class="slide" aria-label="Slide di esempio: clienti per fascia di patrimonio">
       <span class="ring" aria-hidden="true"></span>
-      <span class="slogo">ADVISOR</span>
+      <span class="slogo"><svg class="logo-slide" viewBox="174.5 41.6 284.6 50.2" role="img" aria-label="ADVISOR"><path class="l" d="M 221.488281 90.195312 L 200.4375 42.976562 L 195.710938 42.976562 L 175.546875 90.195312 L 182.453125 90.195312 L 188.320312 76.28125 L 208.351562 76.28125 L 214.605469 90.195312 Z M 205.585938 70.300781 L 190.988281 70.300781 L 198.011719 53.292969 Z M 205.585938 70.300781"/><path class="l" d="M 269.847656 66.738281 C 269.847656 62.347656 268.75 58.289062 266.554688 54.570312 C 264.359375 50.851562 261.402344 48.035156 257.683594 46.117188 C 253.964844 44.203125 248.910156 43.246094 242.523438 43.246094 L 226.695312 43.246094 L 226.695312 90.128906 L 241.550781 90.128906 C 245.71875 90.128906 248.542969 90.011719 250.019531 89.773438 C 251.5 89.539062 253.121094 89.074219 254.894531 88.378906 C 257.917969 87.238281 260.574219 85.546875 262.859375 83.304688 C 265.097656 81.132812 266.824219 78.613281 268.035156 75.742188 C 269.242188 72.875 269.847656 69.875 269.847656 66.738281 M 262.890625 66.367188 C 262.890625 71.5 261.234375 75.742188 257.917969 79.105469 C 256.886719 80.136719 255.75 81.003906 254.507812 81.707031 C 253.261719 82.414062 251.710938 82.996094 249.851562 83.457031 C 247.992188 83.917969 245.382812 84.144531 242.019531 84.144531 L 233.417969 84.144531 L 233.417969 49.226562 L 241.820312 49.226562 C 245.046875 49.226562 247.386719 49.351562 248.84375 49.597656 C 250.300781 49.84375 251.839844 50.347656 253.464844 51.109375 C 255.089844 51.871094 256.527344 52.847656 257.785156 54.03125 C 261.1875 57.214844 262.890625 61.324219 262.890625 66.367188"/><path class="l" d="M 290.535156 76.214844 L 276.414062 43.246094 L 269.644531 43.246094 L 289.878906 90.394531 L 291.402344 90.394531 L 311.253906 43.246094 L 304.558594 43.246094 Z M 290.535156 76.214844"/><path class="l" d="M 316.460938 90.195312 L 323.183594 90.195312 L 323.183594 43.246094 L 316.460938 43.246094 Z M 316.460938 90.195312"/><path class="l" d="M 351.414062 78.65625 C 351.414062 80.417969 350.710938 81.886719 349.3125 83.058594 C 347.914062 84.230469 346.160156 84.816406 344.054688 84.816406 C 339.28125 84.816406 335.082031 82.519531 331.449219 77.917969 L 331.449219 86.457031 C 335.257812 89.308594 339.484375 90.730469 344.121094 90.730469 C 348.152344 90.730469 351.429688 89.554688 353.949219 87.203125 C 356.472656 84.851562 357.730469 81.792969 357.730469 78.027344 C 357.730469 72.742188 354.867188 68.386719 349.140625 64.96875 L 344.007812 61.929688 C 341.703125 60.578125 340.03125 59.289062 338.992188 58.0625 C 337.953125 56.835938 337.433594 55.519531 337.433594 54.113281 C 337.433594 52.527344 338.140625 51.226562 339.550781 50.210938 C 340.960938 49.195312 342.765625 48.6875 344.960938 48.6875 C 348.859375 48.6875 352.5 50.316406 355.882812 53.570312 L 355.882812 45.941406 C 352.613281 43.742188 349.015625 42.640625 345.09375 42.640625 C 340.996094 42.640625 337.660156 43.792969 335.097656 46.101562 C 332.53125 48.410156 331.25 51.410156 331.25 55.109375 C 331.25 57.574219 331.925781 59.75 333.28125 61.644531 C 334.636719 63.539062 336.917969 65.464844 340.121094 67.417969 L 345.230469 70.523438 C 349.351562 73.085938 351.414062 75.796875 351.414062 78.65625"/><path class="o" d="M 413.519531 66.738281 C 413.519531 59.8125 411.105469 54.054688 406.28125 49.460938 C 401.457031 44.871094 395.417969 42.574219 388.164062 42.574219 C 380.910156 42.574219 374.910156 44.871094 370.160156 49.460938 C 365.414062 54.054688 363.042969 59.859375 363.042969 66.871094 C 363.042969 73.707031 365.398438 79.390625 370.109375 83.925781 C 374.824219 88.464844 380.71875 90.730469 387.792969 90.730469 C 395.203125 90.730469 401.34375 88.464844 406.214844 83.925781 C 411.085938 79.390625 413.519531 73.660156 413.519531 66.738281 M 406.597656 66.601562 C 406.597656 71.710938 404.84375 75.980469 401.34375 79.40625 C 397.839844 82.835938 393.46875 84.550781 388.230469 84.550781 C 383.015625 84.550781 378.671875 82.867188 375.203125 79.507812 C 371.734375 76.148438 370 71.933594 370 66.871094 C 370 61.652344 371.726562 57.359375 375.1875 54 C 378.644531 50.640625 383.058594 48.957031 388.433594 48.957031 C 393.535156 48.957031 397.839844 50.65625 401.34375 54.050781 C 404.84375 57.445312 406.597656 61.628906 406.597656 66.601562"/><path class="l" d="M 458.183594 90.195312 L 455.695312 86.832031 C 454.710938 85.488281 453.402344 83.484375 451.765625 80.816406 C 449.167969 76.582031 447.148438 73.613281 445.714844 71.914062 C 444.28125 70.210938 442.8125 68.867188 441.3125 67.878906 C 443.867188 66.894531 445.828125 65.402344 447.195312 63.410156 C 448.5625 61.414062 449.246094 59.050781 449.246094 56.320312 C 449.246094 52.308594 447.847656 49.125 445.058594 46.773438 C 442.269531 44.421875 438.5 43.246094 433.753906 43.246094 L 421.988281 43.246094 L 421.988281 90.195312 L 428.710938 90.195312 L 428.710938 69.761719 L 430.460938 69.761719 C 432.660156 69.761719 434.222656 70.011719 435.152344 70.515625 C 436.085938 71.019531 437.128906 71.839844 438.28125 72.980469 C 439.4375 74.121094 440.710938 75.65625 442.097656 77.585938 L 444.34375 81.25 L 446.425781 84.679688 L 447.734375 86.527344 C 447.9375 86.796875 448.070312 86.988281 448.136719 87.101562 L 450.1875 90.195312 Z M 441.230469 60.265625 C 440.523438 61.445312 439.539062 62.324219 438.273438 62.90625 C 437.007812 63.488281 434.667969 63.777344 431.265625 63.777344 L 428.710938 63.777344 L 428.710938 48.957031 L 430.726562 48.957031 C 434.019531 48.957031 436.378906 49.203125 437.800781 49.699219 C 439.222656 50.191406 440.328125 51.039062 441.113281 52.234375 C 441.894531 53.433594 442.289062 54.773438 442.289062 56.25 C 442.289062 57.753906 441.933594 59.089844 441.230469 60.265625"/></svg></span>
       <span class="pnum">13</span>
       <div class="inner" style="grid-template-columns: 1fr;">
-        <div style="display:flex; flex-direction:column; min-height:0;">
+        <div>
           <h2>Clienti per fascia di patrimonio</h2>
-          <div class="sub">Distribuzione dei clienti seguiti dai consulenti fee-only (dati di esempio)</div>
+          <div class="sub">Clienti seguiti dai consulenti fee-only (dati di esempio)</div>
           <div class="donut-wrap">
             <svg class="donut" viewBox="0 0 200 200" role="img" aria-label="Oltre 1 milione 45%, 500 mila–1 milione 28%, 250–500 mila 15%, 100–250 mila 8%, sotto 100 mila 4%">
               <g transform="rotate(-90 100 100)" fill="none" stroke-width="56">
@@ -238,5 +227,5 @@ a { color: inherit; }
     </section>
   </div>
 
-  <p class="note"><b>Font usati in questa pagina.</b> Druk Text e Baskerville sono commerciali e qui sono sostituiti da Anton e Libre Baskerville; Inter e Montserrat sono gli originali. Il logo è ricomposto in Inter: per i documenti ufficiali va usato il file del logo.</p>
+  <p class="note">Tutto il testo è in Libre Baskerville, la versione gratuita e incorporabile del Baskerville della rivista. Il logo è il tracciato vettoriale originale estratto dalla copertina.</p>
 </div>
