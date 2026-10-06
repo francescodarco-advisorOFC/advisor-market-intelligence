@@ -15,6 +15,10 @@ emoji, icone decorative, palette inventate). I valori pronti per l'HTML sono in
 Per i documenti Word parti sempre da `design/word/Template ADVISOR.dotx` (stili già
 pronti, logo, intestazione e piè di pagina, font incluso nel file); i file dei font sono
 in `design/fonts/`, gli script per rigenerare il template in `design/word/`.
+Per le presentazioni parti sempre da `design/powerpoint/Template ADVISOR.potx`
+(layout Copertina, Sezione, Titolo e testo, Testo e immagine, Solo titolo, Chiusura;
+esempi di barre etichetta, callout, cifre chiave, grafico a ciambella e tabella).
+Titoli delle slide su una sola riga.
 
 ### Un solo font: Baskerville
 
