@@ -46,7 +46,7 @@ copiala o includila; per gli altri formati riporta gli stessi valori.
 | `--deep` | `#0F3D3E` | verde petrolio: secondo colore, blocchi di contrasto |
 | `--ochre` | `#B8892B` | ocra: terzo colore per grafici/evidenziazioni |
 
-Modalità scura: sfondo `#121212`→ usa `#14140F` (nero caldo), testo `#ECE6D8`,
+Modalità scura: sfondo `#14140F` (nero caldo, mai `#000`), testo `#ECE6D8`,
 accento `#F07A3E`, petrolio `#5FA8A0`, filetti `#2E2C26`.
 
 Grafici: palette nell'ordine petrolio, vermiglio, ocra, `#7A7466`, `#9DB8B0`;
