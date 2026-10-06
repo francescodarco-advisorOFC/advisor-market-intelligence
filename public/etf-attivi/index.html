@@ -1,0 +1,957 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ETF attivi · ADVISOR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: rivista ADVISOR — colonna di lettura su bianco, rubrica verticale sul margine sinistro,
+   moduli interattivi a tutta larghezza, inserti neri per box e sintesi. Tema unico (identità ADVISOR). */
+:root {
+  --advisor-red: #E53446;
+  --logo-grey: #707172;
+  --black: #000000;
+  --white: #FFFFFF;
+  --ink-bg: #101010;
+  --rule-soft: #D8D8D8;
+  --paper-alt: #F5F5F5;
+  --chart-1: #282C34; --chart-2: #505864; --chart-3: #80889C;
+  --chart-4: #C8303F; --chart-5: #A2A3A3; --chart-6: #D8D8D8;
+  --font: "Libre Baskerville", Baskerville, "Baskerville Old Face", Georgia, serif;
+  --col: 44rem;
+  --wide: 70rem;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition: none !important; animation: none !important; } }
+body { margin: 0; background: var(--white); color: var(--black); font: 400 16px/1.65 var(--font); -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration-color: var(--advisor-red); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--advisor-red); outline-offset: 3px; }
+h1, h2, h3, h4 { text-wrap: balance; font-family: var(--font); }
+p { margin: 0; }
+.num { font-variant-numeric: lining-nums tabular-nums; }
+.red { color: var(--advisor-red); }
+.cap { font: italic 400 12.5px/1.5 var(--font); color: var(--logo-grey); }
+
+/* Barra superiore */
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--white); border-bottom: 1px solid var(--black); }
+.topbar-in { max-width: var(--wide); margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 18px; }
+.logo { height: 22px; width: auto; display: block; flex: none; }
+.logo .l { fill: var(--logo-grey); } .logo .o { fill: var(--advisor-red); }
+.topbar .rubric { font: italic 400 13px var(--font); color: var(--logo-grey); white-space: nowrap; }
+.topnav { margin-left: auto; display: flex; gap: 16px; overflow-x: auto; scrollbar-width: none; min-width: 0; }
+.topnav::-webkit-scrollbar { display: none; }
+.topnav a { font: 400 13px var(--font); text-decoration: none; white-space: nowrap; color: var(--logo-grey); padding: 4px 0; border-bottom: 2px solid transparent; }
+.topnav a.on { color: var(--black); border-bottom-color: var(--advisor-red); }
+.progress { height: 3px; background: var(--advisor-red); width: 0; transform-origin: left; }
+
+/* Struttura */
+.page { max-width: var(--wide); margin: 0 auto; padding-inline: 16px; display: grid; grid-template-columns: 1fr; }
+.rail { display: none; }
+@media (min-width: 1000px) {
+  .page { grid-template-columns: 120px minmax(0, 1fr); column-gap: 40px; }
+  .rail { display: block; position: relative; border-right: 1px solid var(--rule-soft); }
+  .rail-in { position: sticky; top: 90px; height: calc(100vh - 130px); display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding-block: 20px; }
+  .rail .vt { writing-mode: vertical-rl; transform: rotate(180deg); font: 700 13px var(--font); letter-spacing: .18em; text-transform: uppercase; }
+  .rail .vt.issue { font: italic 400 13px var(--font); letter-spacing: 0; color: var(--logo-grey); }
+  .rail .sec-no { font: 400 34px/1 var(--font); color: var(--advisor-red); }
+}
+main { min-width: 0; }
+section { padding-block: 64px 8px; scroll-margin-top: 70px; }
+.prose { max-width: var(--col); }
+.prose p + p, .prose p + ul, .prose ul + p { margin-top: 1em; }
+.kicker { font: 700 12px var(--font); letter-spacing: .14em; text-transform: uppercase; color: var(--advisor-red); margin: 0 0 12px; }
+h2.sec { font: 400 clamp(28px, 4vw, 40px)/1.15 var(--font); margin: 0 0 20px; max-width: 22ch; }
+h2.sec .key { color: var(--advisor-red); }
+.lede { font: 400 19px/1.6 var(--font); }
+h3.blk { font: 700 19px/1.35 var(--font); margin: 40px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--black); }
+ul.dots { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+ul.dots li { position: relative; padding-left: 20px; }
+ul.dots li::before { content: ""; position: absolute; left: 2px; top: .62em; width: 7px; height: 7px; border-radius: 50%; background: var(--advisor-red); }
+.rule { border: 0; border-top: 1px solid var(--black); margin: 0; }
+
+/* Hero */
+.hero { padding-block: 48px 40px; border-bottom: 1px solid var(--black); }
+.hero .type { font: italic 400 15px var(--font); color: var(--logo-grey); margin-bottom: 18px; }
+.hero h1 { font: 400 clamp(36px, 6.4vw, 70px)/1.06 var(--font); margin: 0 0 26px; max-width: 15ch; letter-spacing: -.01em; }
+.hero h1 .key { color: var(--advisor-red); }
+.hero .lede { max-width: 40rem; }
+.byline { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; margin-top: 30px; padding-top: 14px; border-top: 1px solid var(--black); }
+.byline .by { font-style: italic; } .byline .by b { font-style: normal; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 28px 40px; margin-top: 44px; }
+.stat .n { font: 400 clamp(52px, 7vw, 80px)/1 var(--font); font-variant-numeric: lining-nums; white-space: nowrap; }
+.stat .n small { font-size: .34em; margin-left: 4px; }
+.stat .n.red { color: var(--advisor-red); }
+.stat .d { font: 700 14px/1.4 var(--font); margin-top: 10px; max-width: 22ch; }
+
+/* Bottoni / segmenti */
+.seg { display: inline-flex; flex-wrap: wrap; gap: 0; border: 1px solid var(--black); }
+.seg button { font: 400 14px var(--font); background: var(--white); color: var(--black); border: 0; border-right: 1px solid var(--black); padding: 9px 16px; cursor: pointer; }
+.seg button:last-child { border-right: 0; }
+.seg button[aria-selected="true"], .seg button[aria-pressed="true"] { background: var(--black); color: var(--white); }
+.seg button:hover:not([aria-selected="true"]):not([aria-pressed="true"]) { background: var(--paper-alt); }
+
+/* Meccanismo ETF */
+.mech { display: grid; grid-template-columns: 1fr; gap: 28px; margin-top: 30px; }
+@media (min-width: 820px) { .mech { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: start; } }
+.flow { display: grid; gap: 10px; }
+.flow .lane { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; align-items: stretch; }
+.flow .lane-l { font: italic 400 12.5px/1.35 var(--font); color: var(--logo-grey); border-top: 1px solid var(--black); padding-top: 8px; }
+.flow .nodes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; border-top: 1px solid var(--rule-soft); padding-top: 8px; }
+.node { font: 700 14px var(--font); background: var(--white); color: var(--black); border: 1px solid var(--black); padding: 9px 13px; cursor: pointer; text-align: left; }
+.node:hover { background: var(--paper-alt); }
+.node[aria-pressed="true"] { background: var(--advisor-red); border-color: var(--advisor-red); color: var(--white); }
+.arrow { font: 400 16px var(--font); color: var(--logo-grey); }
+.mech-panel { background: var(--black); color: var(--white); padding: 22px 22px 24px; min-height: 220px; }
+.box-label { display: inline-block; background: var(--advisor-red); color: var(--white); font: 700 15px var(--font); padding: 4px 10px; margin-bottom: 14px; }
+.mech-panel h4 { font: 400 26px/1.2 var(--font); margin: 0 0 10px; }
+.mech-panel p { font-size: 15px; }
+.mech-panel .where { margin-top: 14px; font: italic 400 13px var(--font); color: var(--chart-6); }
+.callout-line { margin-top: 26px; padding: 16px 0 0; border-top: 1px solid var(--black); display: grid; gap: 6px; max-width: var(--col); }
+.callout-line b { font-size: 17px; }
+
+/* Grafici */
+.charts { display: grid; grid-template-columns: 1fr; gap: 40px; margin-top: 34px; }
+@media (min-width: 820px) { .charts { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); } }
+.chart-h { font: 700 15px var(--font); margin: 0 0 4px; }
+.chart-sub { font: italic 400 13px var(--font); color: var(--logo-grey); margin: 0 0 18px; }
+.hbars { display: grid; gap: 12px; }
+.hbar { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 12px; align-items: center; }
+.hbar .lab { font-size: 14px; }
+.hbar .track { position: relative; height: 26px; }
+.hbar .fill { height: 100%; background: var(--chart-1); width: var(--w); transition: width .9s cubic-bezier(.2,.7,.2,1); }
+.hbar.hl .fill { background: var(--advisor-red); }
+.hbar .val { position: absolute; top: 50%; transform: translateY(-50%); left: calc(var(--w) + 8px); font-size: 13px; white-space: nowrap; font-variant-numeric: lining-nums tabular-nums; }
+.hbar.inside .val { left: auto; right: calc(100% - var(--w) + 8px); color: var(--white); }
+.stack { display: grid; gap: 18px; }
+.stack-row .stack-lab { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px; }
+.stack-bar { display: flex; height: 34px; }
+.stack-bar span { display: flex; align-items: center; padding-inline: 10px; font: 700 13px var(--font); color: var(--white); font-variant-numeric: lining-nums; }
+.stack-bar .p { background: var(--chart-1); }
+.stack-bar .a { background: var(--advisor-red); justify-content: center; padding-inline: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 14px; font-size: 13px; }
+.legend i { display: inline-block; width: 11px; height: 11px; margin-right: 7px; vertical-align: -1px; }
+.chart-note { margin-top: 18px; font-size: 14.5px; max-width: 34rem; }
+
+/* Tabelle */
+.tbl-wrap { overflow-x: auto; margin-top: 18px; }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th { font-weight: 700; text-align: left; border-bottom: 1px solid var(--black); padding: 10px 14px 10px 0; vertical-align: bottom; }
+td { border-bottom: 1px solid var(--rule-soft); padding: 10px 14px 10px 0; vertical-align: top; }
+tbody tr:last-child td { border-bottom: 1px solid var(--black); }
+td.r, th.r { text-align: right; font-variant-numeric: lining-nums tabular-nums; }
+.prov-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; }
+.share { display: inline-block; height: 8px; background: var(--chart-3); vertical-align: middle; margin-right: 8px; }
+tr.top .share { background: var(--advisor-red); }
+
+/* Confronto */
+.cmp th.col-a, .cmp td.col-a { background: var(--paper-alt); padding-left: 12px; }
+.cmp td .m { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 8px; vertical-align: 1px; }
+.cmp td .m.etf { background: var(--chart-1); }
+.cmp td .m.fund { background: var(--advisor-red); }
+.cmp td.dim { opacity: .35; }
+.cmp td:first-child { font-weight: 700; width: 20%; }
+.cmp-key { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 13.5px; margin-top: 14px; }
+.cmp-key .m { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
+
+/* Griglia tipologie */
+.types { display: grid; grid-template-columns: 1fr; gap: 0; margin-top: 26px; border-top: 1px solid var(--black); }
+@media (min-width: 720px) { .types { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.type { padding: 18px 20px 22px 0; border-bottom: 1px solid var(--rule-soft); }
+.type h4 { font: 700 16px var(--font); margin: 0 0 6px; display: flex; align-items: baseline; gap: 8px; }
+.type h4 .tag { font: italic 400 12px var(--font); color: var(--logo-grey); }
+.type.act h4 { color: var(--advisor-red); }
+.type p { font-size: 14.5px; }
+
+/* Slider tracking error */
+.te { margin-top: 30px; background: var(--ink-bg); color: var(--white); padding: 26px 22px 28px; border-left: 8px solid var(--advisor-red); }
+.te-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px; align-items: flex-end; }
+.te-name { font: 400 clamp(28px, 4vw, 40px)/1.1 var(--font); }
+.te-band { font: italic 400 14px var(--font); color: var(--chart-6); }
+.te input[type=range] { width: 100%; margin: 24px 0 6px; accent-color: var(--advisor-red); height: 28px; }
+.te-ticks { display: grid; grid-template-columns: repeat(4, 1fr); font-size: 12px; color: var(--chart-5); }
+.te-ticks span:nth-child(2) { text-align: center; transform: translateX(-16%); }
+.te-ticks span:nth-child(3) { text-align: center; transform: translateX(16%); }
+.te-ticks span:last-child { text-align: right; }
+.te-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 22px 28px; margin-top: 26px; }
+.te-cell .k { font: 700 13px var(--font); text-transform: uppercase; letter-spacing: .1em; padding-bottom: 6px; border-bottom: 3px solid var(--advisor-red); margin-bottom: 10px; }
+.te-cell .v { font: 400 30px/1.1 var(--font); font-variant-numeric: lining-nums; }
+.te-cell .v small { font-size: 14px; color: var(--chart-5); display: block; margin-top: 4px; font-style: italic; }
+.te-cell p { font-size: 14.5px; }
+.dims { margin-top: 34px; display: grid; gap: 0; }
+.dim-row { display: grid; grid-template-columns: 1fr; gap: 6px; padding: 14px 0; border-top: 1px solid var(--rule-soft); }
+@media (min-width: 720px) { .dim-row { grid-template-columns: 170px minmax(0, 1fr) minmax(0, 1fr); gap: 20px; } }
+.dim-row .k { font: 700 13px var(--font); text-transform: uppercase; letter-spacing: .08em; }
+.dim-row .s { font-size: 14.5px; color: var(--logo-grey); transition: color .3s; padding-left: 14px; border-left: 3px solid transparent; }
+.dim-row .s.on { color: var(--black); border-left-color: var(--advisor-red); }
+.dim-head { display: none; }
+@media (min-width: 720px) { .dim-head { display: grid; grid-template-columns: 170px minmax(0,1fr) minmax(0,1fr); gap: 20px; font: italic 400 13px var(--font); color: var(--logo-grey); padding-bottom: 8px; } .dim-head span { padding-left: 17px; } }
+
+/* Modelli */
+.models-tools { margin-top: 22px; }
+.models td:first-child { font-weight: 700; width: 24%; }
+.models td:last-child { font-style: italic; color: var(--logo-grey); width: 26%; }
+.models tr[hidden] { display: none; }
+.quote { margin-top: 30px; max-width: var(--col); }
+.quote blockquote { font: italic 400 clamp(20px, 2.6vw, 25px)/1.45 var(--font); margin: 0; }
+
+/* Stakeholder */
+.who { margin-top: 26px; }
+.who-panel { margin-top: 24px; }
+.cols2 { display: grid; grid-template-columns: 1fr; gap: 30px 44px; }
+@media (min-width: 820px) { .cols2 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.col-h { font: 700 13px var(--font); text-transform: uppercase; letter-spacing: .12em; padding-bottom: 8px; border-bottom: 1px solid var(--black); margin: 0 0 4px; display: flex; justify-content: space-between; }
+.col-h.att { color: var(--advisor-red); }
+details.pt { border-bottom: 1px solid var(--rule-soft); }
+details.pt summary { cursor: pointer; list-style: none; padding: 13px 28px 13px 0; font: 700 15.5px/1.4 var(--font); position: relative; }
+details.pt summary::-webkit-details-marker { display: none; }
+details.pt summary::after { content: "+"; position: absolute; right: 2px; top: 10px; font: 400 20px var(--font); color: var(--advisor-red); }
+details.pt[open] summary::after { content: "–"; }
+details.pt .b { padding: 0 0 16px; font-size: 15px; display: grid; gap: 10px; }
+.verdict { margin-top: 28px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: center; padding: 18px 0; border-top: 1px solid var(--black); border-bottom: 1px solid var(--black); }
+.verdict .vn { font: 400 46px/1 var(--font); color: var(--advisor-red); }
+.verdict p { font: italic 400 17px/1.5 var(--font); }
+.sub-h { font: 700 16px var(--font); margin: 30px 0 10px; }
+
+/* Calcolatore */
+.calc { margin-top: 30px; display: grid; grid-template-columns: 1fr; gap: 28px 44px; padding: 26px 0; border-top: 1px solid var(--black); border-bottom: 1px solid var(--black); }
+@media (min-width: 820px) { .calc { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.ctrl { display: grid; gap: 4px; }
+.ctrl + .ctrl { margin-top: 20px; }
+.ctrl label { font: 700 14.5px var(--font); display: flex; justify-content: space-between; gap: 10px; }
+.ctrl label output { font-weight: 400; font-variant-numeric: lining-nums tabular-nums; }
+.ctrl input[type=range] { width: 100%; accent-color: var(--advisor-red); height: 28px; }
+.ctrl .cap { margin-top: -2px; }
+.res-bar { display: flex; height: 40px; margin: 6px 0 12px; background: var(--paper-alt); }
+.res-bar .fee { background: var(--advisor-red); transition: width .4s; }
+.res-bar .net { background: var(--chart-1); transition: width .4s; }
+.res-big { display: flex; flex-wrap: wrap; gap: 14px 34px; }
+.res-big .n { font: 400 48px/1 var(--font); font-variant-numeric: lining-nums tabular-nums; }
+.res-big .n small { font-size: 16px; margin-left: 3px; }
+.res-big .d { font: 700 13px var(--font); margin-top: 6px; }
+.res-msg { margin-top: 16px; font: italic 400 16px/1.5 var(--font); }
+
+/* Checklist */
+.dd { margin-top: 26px; }
+.dd-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+.dd-count { font: italic 400 14px var(--font); color: var(--logo-grey); }
+.dd-list { list-style: none; margin: 20px 0 0; padding: 0; border-top: 1px solid var(--black); }
+.dd-list li { border-bottom: 1px solid var(--rule-soft); }
+.dd-list label { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; padding: 14px 0; cursor: pointer; }
+.dd-list input { width: 18px; height: 18px; margin: 3px 0 0; accent-color: var(--advisor-red); }
+.dd-list .t { font: 700 15.5px var(--font); display: block; }
+.dd-list .x { font-size: 14.5px; color: var(--logo-grey); display: block; margin-top: 2px; }
+.dd-list input:checked + span .t { text-decoration: line-through; text-decoration-color: var(--advisor-red); }
+.box { background: var(--black); color: var(--white); padding: 22px; margin-top: 30px; max-width: var(--col); }
+.box p { font-size: 15px; }
+.box p + p { margin-top: 10px; }
+
+/* Domande */
+.qs { display: grid; grid-template-columns: 1fr; gap: 0 44px; margin-top: 26px; }
+@media (min-width: 820px) { .qs { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.qs .grp { font: 700 13px var(--font); text-transform: uppercase; letter-spacing: .12em; border-bottom: 1px solid var(--black); padding-bottom: 8px; }
+.q { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 10px; padding: 16px 0; border-bottom: 1px solid var(--rule-soft); }
+.q .no { font: 400 28px/1 var(--font); color: var(--advisor-red); font-variant-numeric: lining-nums; }
+.q b { display: block; font-size: 16px; margin-bottom: 4px; }
+.q span { font-size: 14.5px; color: var(--logo-grey); }
+
+/* Sintesi */
+.synth { background: var(--ink-bg); color: var(--white); margin-top: 64px; padding: 44px 22px 48px; }
+@media (min-width: 720px) { .synth { padding: 52px 44px 56px; } }
+.synth h2 { font: 400 clamp(28px, 4vw, 40px)/1.15 var(--font); margin: 14px 0 32px; }
+.synth h2 .key { color: var(--advisor-red); }
+.msgs { display: grid; grid-template-columns: 1fr; gap: 28px; }
+@media (min-width: 820px) { .msgs { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px; } }
+.msg .who-l { font: 700 18px var(--font); padding-bottom: 8px; border-bottom: 3px solid var(--advisor-red); margin-bottom: 12px; }
+.msg .lvl { font: italic 400 13px var(--font); color: var(--chart-5); margin-bottom: 8px; }
+.msg p { font-size: 15.5px; }
+
+/* Fonti e piede */
+.sources { padding-block: 48px 30px; }
+.sources h3 { font: 700 15px var(--font); margin: 0 0 12px; }
+.sources ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: 13px; color: var(--logo-grey); }
+.sources ol a { word-break: break-word; }
+.foot { border-top: 1px solid var(--black); padding-block: 14px 40px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; font-size: 13px; }
+.foot .cap { max-width: 44rem; }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-in">
+    <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="174.5 41.6 284.6 50.2" role="img" aria-label="ADVISOR"><path class="l" d="M 221.488281 90.195312 L 200.4375 42.976562 L 195.710938 42.976562 L 175.546875 90.195312 L 182.453125 90.195312 L 188.320312 76.28125 L 208.351562 76.28125 L 214.605469 90.195312 Z M 205.585938 70.300781 L 190.988281 70.300781 L 198.011719 53.292969 Z M 205.585938 70.300781"/><path class="l" d="M 269.847656 66.738281 C 269.847656 62.347656 268.75 58.289062 266.554688 54.570312 C 264.359375 50.851562 261.402344 48.035156 257.683594 46.117188 C 253.964844 44.203125 248.910156 43.246094 242.523438 43.246094 L 226.695312 43.246094 L 226.695312 90.128906 L 241.550781 90.128906 C 245.71875 90.128906 248.542969 90.011719 250.019531 89.773438 C 251.5 89.539062 253.121094 89.074219 254.894531 88.378906 C 257.917969 87.238281 260.574219 85.546875 262.859375 83.304688 C 265.097656 81.132812 266.824219 78.613281 268.035156 75.742188 C 269.242188 72.875 269.847656 69.875 269.847656 66.738281 M 262.890625 66.367188 C 262.890625 71.5 261.234375 75.742188 257.917969 79.105469 C 256.886719 80.136719 255.75 81.003906 254.507812 81.707031 C 253.261719 82.414062 251.710938 82.996094 249.851562 83.457031 C 247.992188 83.917969 245.382812 84.144531 242.019531 84.144531 L 233.417969 84.144531 L 233.417969 49.226562 L 241.820312 49.226562 C 245.046875 49.226562 247.386719 49.351562 248.84375 49.597656 C 250.300781 49.84375 251.839844 50.347656 253.464844 51.109375 C 255.089844 51.871094 256.527344 52.847656 257.785156 54.03125 C 261.1875 57.214844 262.890625 61.324219 262.890625 66.367188"/><path class="l" d="M 290.535156 76.214844 L 276.414062 43.246094 L 269.644531 43.246094 L 289.878906 90.394531 L 291.402344 90.394531 L 311.253906 43.246094 L 304.558594 43.246094 Z M 290.535156 76.214844"/><path class="l" d="M 316.460938 90.195312 L 323.183594 90.195312 L 323.183594 43.246094 L 316.460938 43.246094 Z M 316.460938 90.195312"/><path class="l" d="M 351.414062 78.65625 C 351.414062 80.417969 350.710938 81.886719 349.3125 83.058594 C 347.914062 84.230469 346.160156 84.816406 344.054688 84.816406 C 339.28125 84.816406 335.082031 82.519531 331.449219 77.917969 L 331.449219 86.457031 C 335.257812 89.308594 339.484375 90.730469 344.121094 90.730469 C 348.152344 90.730469 351.429688 89.554688 353.949219 87.203125 C 356.472656 84.851562 357.730469 81.792969 357.730469 78.027344 C 357.730469 72.742188 354.867188 68.386719 349.140625 64.96875 L 344.007812 61.929688 C 341.703125 60.578125 340.03125 59.289062 338.992188 58.0625 C 337.953125 56.835938 337.433594 55.519531 337.433594 54.113281 C 337.433594 52.527344 338.140625 51.226562 339.550781 50.210938 C 340.960938 49.195312 342.765625 48.6875 344.960938 48.6875 C 348.859375 48.6875 352.5 50.316406 355.882812 53.570312 L 355.882812 45.941406 C 352.613281 43.742188 349.015625 42.640625 345.09375 42.640625 C 340.996094 42.640625 337.660156 43.792969 335.097656 46.101562 C 332.53125 48.410156 331.25 51.410156 331.25 55.109375 C 331.25 57.574219 331.925781 59.75 333.28125 61.644531 C 334.636719 63.539062 336.917969 65.464844 340.121094 67.417969 L 345.230469 70.523438 C 349.351562 73.085938 351.414062 75.796875 351.414062 78.65625"/><path class="o" d="M 413.519531 66.738281 C 413.519531 59.8125 411.105469 54.054688 406.28125 49.460938 C 401.457031 44.871094 395.417969 42.574219 388.164062 42.574219 C 380.910156 42.574219 374.910156 44.871094 370.160156 49.460938 C 365.414062 54.054688 363.042969 59.859375 363.042969 66.871094 C 363.042969 73.707031 365.398438 79.390625 370.109375 83.925781 C 374.824219 88.464844 380.71875 90.730469 387.792969 90.730469 C 395.203125 90.730469 401.34375 88.464844 406.214844 83.925781 C 411.085938 79.390625 413.519531 73.660156 413.519531 66.738281 M 406.597656 66.601562 C 406.597656 71.710938 404.84375 75.980469 401.34375 79.40625 C 397.839844 82.835938 393.46875 84.550781 388.230469 84.550781 C 383.015625 84.550781 378.671875 82.867188 375.203125 79.507812 C 371.734375 76.148438 370 71.933594 370 66.871094 C 370 61.652344 371.726562 57.359375 375.1875 54 C 378.644531 50.640625 383.058594 48.957031 388.433594 48.957031 C 393.535156 48.957031 397.839844 50.65625 401.34375 54.050781 C 404.84375 57.445312 406.597656 61.628906 406.597656 66.601562"/><path class="l" d="M 458.183594 90.195312 L 455.695312 86.832031 C 454.710938 85.488281 453.402344 83.484375 451.765625 80.816406 C 449.167969 76.582031 447.148438 73.613281 445.714844 71.914062 C 444.28125 70.210938 442.8125 68.867188 441.3125 67.878906 C 443.867188 66.894531 445.828125 65.402344 447.195312 63.410156 C 448.5625 61.414062 449.246094 59.050781 449.246094 56.320312 C 449.246094 52.308594 447.847656 49.125 445.058594 46.773438 C 442.269531 44.421875 438.5 43.246094 433.753906 43.246094 L 421.988281 43.246094 L 421.988281 90.195312 L 428.710938 90.195312 L 428.710938 69.761719 L 430.460938 69.761719 C 432.660156 69.761719 434.222656 70.011719 435.152344 70.515625 C 436.085938 71.019531 437.128906 71.839844 438.28125 72.980469 C 439.4375 74.121094 440.710938 75.65625 442.097656 77.585938 L 444.34375 81.25 L 446.425781 84.679688 L 447.734375 86.527344 C 447.9375 86.796875 448.070312 86.988281 448.136719 87.101562 L 450.1875 90.195312 Z M 441.230469 60.265625 C 440.523438 61.445312 439.539062 62.324219 438.273438 62.90625 C 437.007812 63.488281 434.667969 63.777344 431.265625 63.777344 L 428.710938 63.777344 L 428.710938 48.957031 L 430.726562 48.957031 C 434.019531 48.957031 436.378906 49.203125 437.800781 49.699219 C 439.222656 50.191406 440.328125 51.039062 441.113281 52.234375 C 441.894531 53.433594 442.289062 54.773438 442.289062 56.25 C 442.289062 57.753906 441.933594 59.089844 441.230469 60.265625"/></svg>
+    <span class="rubric">Market Intelligence</span>
+    <nav class="topnav" aria-label="Sezioni">
+      <a href="#come-funziona">Come funziona</a>
+      <a href="#mercato">Il mercato</a>
+      <a href="#differenze">Le differenze</a>
+      <a href="#quanto-attivo">Quanto attivo</a>
+      <a href="#modelli">I modelli</a>
+      <a href="#chi-guadagna">Chi ci guadagna</a>
+      <a href="#scegliere">Come scegliere</a>
+      <a href="#sintesi">Sintesi</a>
+    </nav>
+  </div>
+  <div class="progress" id="progress"></div>
+</header>
+
+<div class="page">
+  <aside class="rail" aria-hidden="true">
+    <div class="rail-in">
+      <span class="vt">Approfondimento · ETF attivi</span>
+      <span class="sec-no num" id="railNo">00</span>
+      <span class="vt issue">ADVISOR ottobre 2026</span>
+    </div>
+  </aside>
+
+  <main>
+    <div class="hero">
+      <div class="type">Guida per consulenti finanziari</div>
+      <h1>ETF attivi: la gestione attiva entra nel <span class="key">wrapper</span></h1>
+      <p class="lede">Uniscono il lavoro di un gestore alla meccanica di un ETF: quotazione in Borsa, trasparenza giornaliera, un solo TER. Per gli asset manager il vantaggio è evidente. Per investitori e consulenti la domanda resta aperta: dopo i costi, resta abbastanza alpha da giustificarli?</p>
+      <div class="byline">
+        <span class="by">a cura di <b>ADVISOR Market Intelligence</b></span>
+        <span class="cap">Ottobre 2026 · lettura di circa 12 minuti</span>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="n num">18.829<small>mld $</small></div><div class="d">patrimonio degli ETF nel mondo</div></div>
+        <div class="stat"><div class="n red num">12<small>%</small></div><div class="d">la quota di ETF attivi negli Stati Uniti</div></div>
+        <div class="stat"><div class="n num">8<small>%</small></div><div class="d">la quota attiva fuori dagli Stati Uniti</div></div>
+      </div>
+      <p class="cap" style="margin-top:18px">Fonte: Morningstar, dati al 31 marzo 2026.</p>
+    </div>
+
+    <!-- 01 -->
+    <section id="come-funziona" data-no="01">
+      <div class="prose">
+        <p class="kicker">01 · Le basi</p>
+        <h2 class="sec">Un fondo aperto che si compra <span class="key">in Borsa</span></h2>
+        <p>Un ETF è un fondo aperto quotato. Ha un portafoglio diversificato e un NAV calcolato ogni giorno, ma si negozia durante la seduta come un'azione. Le quote non nascono quando l'investitore compra: vengono create o rimborsate in grandi blocchi da intermediari specializzati, gli Authorized Participant.</p>
+        <p>Il sistema funziona su due piani. Sul <b>mercato secondario</b> investitori e market maker si scambiano quote già esistenti. Sul <b>mercato primario</b> gli AP creano e rimborsano quote direttamente con l'emittente. Seleziona un attore per vedere che ruolo ha.</p>
+      </div>
+
+      <div class="mech">
+        <div class="flow" role="group" aria-label="Attori dell'ETF">
+          <div class="lane">
+            <div class="lane-l">Mercato secondario</div>
+            <div class="nodes">
+              <button class="node" data-k="inv" aria-pressed="true">Investitori</button>
+              <span class="arrow" aria-hidden="true">⇄</span>
+              <button class="node" data-k="borsa" aria-pressed="false">Borsa / listing</button>
+              <span class="arrow" aria-hidden="true">⇄</span>
+              <button class="node" data-k="mm" aria-pressed="false">Market maker</button>
+            </div>
+          </div>
+          <div class="lane">
+            <div class="lane-l">Mercato primario</div>
+            <div class="nodes">
+              <button class="node" data-k="ap" aria-pressed="false">Authorized Participant</button>
+              <span class="arrow" aria-hidden="true">⇄</span>
+              <button class="node" data-k="manco" aria-pressed="false">Issuer / ManCo</button>
+            </div>
+          </div>
+          <div class="lane">
+            <div class="lane-l">Dentro il fondo</div>
+            <div class="nodes">
+              <button class="node" data-k="pm" aria-pressed="false">Portfolio manager</button>
+              <button class="node" data-k="dep" aria-pressed="false">Depositary</button>
+              <button class="node" data-k="adm" aria-pressed="false">Administrator</button>
+            </div>
+          </div>
+        </div>
+        <div class="mech-panel" aria-live="polite">
+          <span class="box-label" id="mLabel">Mercato secondario</span>
+          <h4 id="mTitle">Investitori</h4>
+          <p id="mText"></p>
+          <p class="where" id="mWhere"></p>
+        </div>
+      </div>
+
+      <div class="callout-line">
+        <b>Prezzo dell'ETF ≈ valore del portafoglio</b>
+        <p>L'arbitraggio degli AP riallinea premio e sconto al NAV. La liquidità dell'ETF dipende anche da quella degli strumenti sottostanti.</p>
+        <p class="cap">Fonti: BlackRock/iShares; State Street; ETFGI.</p>
+      </div>
+    </section>
+
+    <!-- 02 -->
+    <section id="mercato" data-no="02">
+      <div class="prose">
+        <p class="kicker">02 · Il mercato</p>
+        <h2 class="sec">Un mercato ancora passivo, con <span class="key">spazio</span> per l'attivo</h2>
+        <p>Gli ETF passivi dominano ancora gli asset, negli Stati Uniti e nel resto del mondo. La gestione attiva vale il 12% degli ETF americani e l'8% altrove. L'obbligazionario resta indietro rispetto all'azionario in tutte le aree, e il divario lascia margine di recupero agli ETF obbligazionari nei prossimi anni.</p>
+      </div>
+
+      <div class="charts">
+        <div>
+          <p class="chart-h">Patrimonio degli ETF per domicilio</p>
+          <p class="chart-sub">Miliardi di dollari e quota sul totale</p>
+          <div class="hbars" id="aumBars"></div>
+        </div>
+        <div>
+          <p class="chart-h">Quanto pesa la gestione attiva</p>
+          <p class="chart-sub">Quota degli asset ETF, in %</p>
+          <div class="stack">
+            <div class="stack-row">
+              <div class="stack-lab"><span>Stati Uniti</span></div>
+              <div class="stack-bar"><span class="p" style="width:88%">Passivi 88%</span><span class="a" style="width:12%">12%</span></div>
+            </div>
+            <div class="stack-row">
+              <div class="stack-lab"><span>Fuori dagli USA</span></div>
+              <div class="stack-bar"><span class="p" style="width:92%">Passivi 92%</span><span class="a" style="width:8%">8%</span></div>
+            </div>
+          </div>
+          <div class="legend"><span><i style="background:var(--chart-1)"></i>Passivi</span><span><i style="background:var(--advisor-red)"></i>Attivi</span></div>
+          <p class="chart-note">L'Europa pesa il 17% del mercato mondiale: è il secondo polo, ma con una quota attiva ancora inferiore a quella americana.</p>
+        </div>
+      </div>
+      <p class="cap" style="margin-top:18px">Fonte: Morningstar, al 31 marzo 2026.</p>
+
+      <h3 class="blk">I principali operatori</h3>
+      <div class="prov-tools">
+        <div class="seg" role="tablist" aria-label="Area geografica">
+          <button role="tab" data-area="glob" aria-selected="true">Globale</button>
+          <button role="tab" data-area="am" aria-selected="false">Americhe</button>
+          <button role="tab" data-area="emea" aria-selected="false">EMEA</button>
+        </div>
+        <span class="cap" id="provNote"></span>
+      </div>
+      <div class="tbl-wrap">
+        <table id="provTbl">
+          <thead><tr><th>#</th><th>Provider</th><th class="r">AUM (trilioni $)</th><th>Quota di mercato</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="chart-note">La scala riduce il costo unitario. La crescita marginale si sposta verso attivi, income, fixed income e soluzioni outcome.</p>
+      <p class="cap" style="margin-top:8px">Fonti: ETFGI (dati globali, fine 2025); Trackinsight (dati regionali, agosto 2026). n.d.: dato non pubblicato.</p>
+    </section>
+
+    <!-- 03 -->
+    <section id="differenze" data-no="03">
+      <div class="prose">
+        <p class="kicker">03 · Le differenze</p>
+        <h2 class="sec">Gestione attiva, <span class="key">meccanica ETF</span></h2>
+        <p>L'ETF attivo prende in prestito la testa dal fondo comune e il corpo dall'ETF. Dal primo eredita l'obiettivo di battere il benchmark e la gestione del rischio fatta ogni giorno dal gestore. Dal secondo eredita trasparenza, negoziazione intraday, un unico TER e un minimo di una sola quota.</p>
+      </div>
+      <div class="cmp-key">
+        <span><i class="m" style="background:var(--chart-1)"></i>Come un ETF passivo</span>
+        <span><i class="m" style="background:var(--advisor-red)"></i>Come un fondo comune attivo</span>
+      </div>
+      <div class="prov-tools" style="margin-top:14px">
+        <div class="seg" aria-label="Filtro confronto">
+          <button data-cmp="all" aria-pressed="true">Tutto</button>
+          <button data-cmp="etf" aria-pressed="false">Cosa prende dall'ETF</button>
+          <button data-cmp="fund" aria-pressed="false">Cosa prende dal fondo</button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="cmp" id="cmpTbl">
+          <thead><tr><th></th><th>ETF passivo</th><th class="col-a">ETF attivo</th><th>Fondo comune attivo</th></tr></thead>
+          <tbody>
+            <tr data-s="fund"><td>Gestione</td><td>Passiva</td><td class="col-a"><i class="m fund"></i>Attiva</td><td>Attiva</td></tr>
+            <tr data-s="etf"><td>Trasparenza</td><td>Completa</td><td class="col-a"><i class="m etf"></i>Completa</td><td>Non trasparente</td></tr>
+            <tr data-s="etf"><td>Trading</td><td>Infragiornaliero</td><td class="col-a"><i class="m etf"></i>Infragiornaliero</td><td>Fine giornata</td></tr>
+            <tr data-s="etf"><td>Come si acquista</td><td>Borsa, RFQ o OTC tramite un partecipante autorizzato</td><td class="col-a"><i class="m etf"></i>Borsa, RFQ o OTC tramite un partecipante autorizzato</td><td>Direttamente tramite l'emittente</td></tr>
+            <tr data-s="etf"><td>Costi</td><td>In genere un unico TER</td><td class="col-a"><i class="m etf"></i>In genere un unico TER</td><td>TER diversi per classe di azioni</td></tr>
+            <tr data-s="etf"><td>Investimento minimo</td><td>1 quota</td><td class="col-a"><i class="m etf"></i>1 quota</td><td>Varia per classe di azioni</td></tr>
+            <tr data-s="fund"><td>Obiettivo di performance</td><td>Benchmark meno costi</td><td class="col-a"><i class="m fund"></i>Battere il benchmark</td><td>Battere il benchmark</td></tr>
+            <tr data-s="fund"><td>Gestione del rischio</td><td>Determinata dalla costruzione del benchmark</td><td class="col-a"><i class="m fund"></i>Implementata ogni giorno dal gestore</td><td>Implementata ogni giorno dal gestore</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="cap" style="margin-top:10px">Fonte: Goldman Sachs Asset Management, maggio 2026. Il processo di gestione del rischio monitora e gestisce il rischio, ma non implica un rischio basso.</p>
+
+      <h3 class="blk">Le principali tipologie di ETF</h3>
+      <div class="prose"><p>Le categorie si sovrappongono: un ETF può essere insieme attivo, obbligazionario, a distribuzione di reddito e a scadenza.</p></div>
+      <div class="types">
+        <div class="type"><h4>Indicizzati core</h4><p>Replica fisica o sintetica di azioni, bond, commodity. Tracking difference contenuta.</p></div>
+        <div class="type"><h4>Smart beta / factor</h4><p>Regole sistematiche su value, size, quality, momentum, minimum volatility.</p></div>
+        <div class="type act"><h4>Attivi <span class="tag">il tema di questa guida</span></h4><p>Il gestore seleziona titoli, duration o rischi. Obiettivo: alpha, reddito o accesso.</p></div>
+        <div class="type"><h4>Tematici e settoriali</h4><p>Esposizioni concentrate: AI, difesa, clean energy, healthcare, singoli settori.</p></div>
+        <div class="type"><h4>Outcome / option based</h4><p>Covered call, premium income, buffer, managed floor. Payoff non lineare.</p></div>
+        <div class="type"><h4>Leveraged, inverse, single-stock</h4><p>Esposizione giornaliera amplificata o inversa. Path dependency elevata.</p></div>
+        <div class="type"><h4>ESG / clima</h4><p>Screening, best-in-class, Paris-aligned, transition. Metodologie differenti.</p></div>
+        <div class="type"><h4>Multi-asset e alternative</h4><p>Asset allocation, managed futures, crypto ETP, real asset.</p></div>
+        <div class="type"><h4>Obbligazionari a scadenza</h4><p>Bond con scadenze nello stesso anno: alla fine l'ETF si liquida e rimborsa il NAV finale. Utili per costruire una bond ladder.</p></div>
+      </div>
+      <p class="cap" style="margin-top:10px">Fonti: iShares; Amundi; ETF.com; ETFGI.</p>
+    </section>
+
+    <!-- 04 -->
+    <section id="quanto-attivo" data-no="04">
+      <div class="prose">
+        <p class="kicker">04 · Lo spettro</p>
+        <h2 class="sec">Quanto può essere <span class="key">attivo</span> un ETF</h2>
+        <p>"Attivo" non è un'etichetta binaria. Il metro è il <b>tracking error</b>, cioè quanto il portafoglio si discosta dall'indice di riferimento. Più alpha potenziale richiede un portafoglio più distante dall'indice, e questo può ridurre la semplicità operativa del veicolo ETF. Sposta il cursore per percorrere lo spettro.</p>
+      </div>
+
+      <div class="te">
+        <div class="te-top">
+          <div>
+            <div class="te-band" id="teBand"></div>
+            <div class="te-name" id="teName"></div>
+          </div>
+          <div class="te-band" id="teVehicle"></div>
+        </div>
+        <label for="teRange" class="cap" style="display:block;margin-top:18px;color:var(--chart-5)">Tracking error crescente →</label>
+        <input type="range" id="teRange" min="0" max="3" step="1" value="1" aria-describedby="teName">
+        <div class="te-ticks" aria-hidden="true"><span>Molto basso</span><span>Basso</span><span>Medio</span><span>Alto</span></div>
+        <div class="te-grid">
+          <div class="te-cell"><div class="k">Azioni</div><div class="v num" id="teEq"></div></div>
+          <div class="te-cell"><div class="k">Corporate bond</div><div class="v num" id="teBd"></div></div>
+          <div class="te-cell"><div class="k">Obiettivo</div><p id="teObj"></p></div>
+        </div>
+      </div>
+      <p class="cap" style="margin-top:10px">Fonte: BNP Paribas Asset Management. Livelli tipici di tracking error, solo a scopo illustrativo e informativo; non utilizzare come base per decisioni di investimento.</p>
+
+      <h3 class="blk">Cosa cambia quando il tracking error sale</h3>
+      <div class="dims" id="dims">
+        <div class="dim-head"><span></span><span>ETF attivo a basso tracking error</span><span>Alpha generator ad alto tracking error</span></div>
+        <div class="dim-row"><div class="k">Turnover e quotabilità</div><div class="s lo">Turnover in linea con l'indice; più facile da quotare.</div><div class="s hi">Alto turnover; quotazione più complessa.</div></div>
+        <div class="dim-row"><div class="k">Uso di derivati</div><div class="s lo">Non richiede necessariamente l'uso di derivati.</div><div class="s hi">Uso di derivati limitato o non sempre possibile nel wrapper ETF.</div></div>
+        <div class="dim-row"><div class="k">Trasparenza</div><div class="s lo">È sostenibile una trasparenza totale e giornaliera.</div><div class="s hi">Può richiedere un livello di trasparenza più basso.</div></div>
+        <div class="dim-row"><div class="k">Liquidità dei titoli</div><div class="s lo">Titoli quotati con livelli di liquidità adeguati.</div><div class="s hi">Titoli non quotati o poco liquidi sono difficili da includere.</div></div>
+        <div class="dim-row"><div class="k">Costo</div><div class="s lo">Costo simile a quello di un ETF passivo.</div><div class="s hi">Costo dell'ETF più elevato.</div></div>
+      </div>
+      <p class="cap" style="margin-top:10px">Fonte: BNP Paribas Asset Management. Solo a titolo informativo.</p>
+    </section>
+
+    <!-- 05 -->
+    <section id="modelli" data-no="05">
+      <div class="prose">
+        <p class="kicker">05 · I modelli</p>
+        <h2 class="sec">Dal core enhanced agli <span class="key">outcome</span> ETF</h2>
+        <p>Sotto la stessa etichetta convivono approcci molto diversi: modelli quantitativi a basso scostamento, gestioni fondamentali concentrate, strategie con opzioni, strutture semi-trasparenti. Filtra per famiglia.</p>
+      </div>
+      <div class="models-tools">
+        <div class="seg" aria-label="Filtro modelli">
+          <button data-f="all" aria-pressed="true">Tutti</button>
+          <button data-f="quant" aria-pressed="false">Sistematici</button>
+          <button data-f="fund" aria-pressed="false">Fondamentali</button>
+          <button data-f="opt" aria-pressed="false">Con opzioni</button>
+          <button data-f="str" aria-pressed="false">Strutture speciali</button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table class="models" id="modTbl">
+          <thead><tr><th>Modello</th><th>Come funziona</th><th>Esempi</th></tr></thead>
+          <tbody>
+            <tr data-f="quant"><td>Factor based</td><td>Regole quantitative. Tilt su value, quality, momentum, size.</td><td>DYNF; ETF factor rotation</td></tr>
+            <tr data-f="quant"><td>Core enhanced / low TE</td><td>Portafoglio ampio. Scostamenti contenuti. Alpha incrementale.</td><td>DFAC; iShares Enhanced</td></tr>
+            <tr data-f="fund"><td>Qualitativi / high conviction</td><td>Ricerca fondamentale. Portafoglio concentrato o benchmark-aware.</td><td>Capital Group; T. Rowe Price</td></tr>
+            <tr data-f="fund"><td>Fixed income attivi</td><td>Selezione di emittenti, duration, curve, credito. Indici meno efficienti.</td><td>BINC; Amundi Active Bond</td></tr>
+            <tr data-f="opt"><td>Premium income / covered call</td><td>Azioni più premi da opzioni. Più reddito, upside limitato.</td><td>JEPI; JEPG</td></tr>
+            <tr data-f="opt"><td>Buffer / defined outcome</td><td>Protezione parziale o floor su un periodo. Upside limitato.</td><td>Innovator; iShares Buffer</td></tr>
+            <tr data-f="str"><td>Semi-transparent</td><td>Portafoglio proxy o disclosure ritardata. Protegge la proprietà intellettuale.</td><td>Fidelity; ActiveShares</td></tr>
+            <tr data-f="str"><td>Single-security / leveraged</td><td>Esposizione a una singola azione, spesso 2x, inversa o option-income. Non diversificato.</td><td>Direxion; GraniteShares; YieldMax</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="cap" style="margin-top:10px">Fonti: iShares; Dimensional; J.P. Morgan AM; Amundi; ETFGI. Gli esempi citati non costituiscono raccomandazioni.</p>
+      <div class="quote">
+        <blockquote>“Attivo” descrive la libertà di gestione. Non implica stock picking discrezionale né sovraperformance.</blockquote>
+      </div>
+    </section>
+
+    <!-- 06 -->
+    <section id="chi-guadagna" data-no="06">
+      <div class="prose">
+        <p class="kicker">06 · Benefici e punti di attenzione</p>
+        <h2 class="sec">Chi ci <span class="key">guadagna</span> davvero</h2>
+        <p>Lo stesso prodotto ha un valore diverso per chi lo costruisce, per chi lo compra e per chi lo consiglia. Scegli il punto di vista.</p>
+      </div>
+      <div class="who">
+        <div class="seg" role="tablist" aria-label="Punto di vista">
+          <button role="tab" data-who="am" aria-selected="true" aria-controls="who-am">Asset manager</button>
+          <button role="tab" data-who="inv" aria-selected="false" aria-controls="who-inv">Investitori</button>
+          <button role="tab" data-who="cf" aria-selected="false" aria-controls="who-cf">Consulenti</button>
+        </div>
+
+        <!-- Asset manager -->
+        <div class="who-panel" id="who-am" role="tabpanel">
+          <div class="cols2">
+            <div>
+              <p class="col-h"><span>Benefici</span><span>4</span></p>
+              <details class="pt" open><summary>Recupero di marginalità</summary><div class="b">
+                <p>Gli ETF attivi sono un'opportunità per gli asset manager perché consentono di:</p>
+                <ul class="dots"><li>recuperare redditività e marginalità, in particolare con le strategie quantitative;</li><li>facilitare l'accesso all'investitore finale.</li></ul>
+              </div></details>
+              <details class="pt"><summary>Più scalabilità per le gestioni quantitative</summary><div class="b">
+                <p>Le gestioni quantitative:</p>
+                <ul class="dots"><li>coprono un numero elevato di titoli e mercati;</li><li>richiedono meno risorse umane degli approcci qualitativi e fondamentali;</li><li>consentono una gestione più efficiente di molti portafogli;</li><li>favoriscono la personalizzazione tramite modelli.</li></ul>
+                <p>A parità di commissioni di gestione, i costi inferiori aumentano la marginalità. Essendo più diversificate delle gestioni fondamentali, hanno anche minori vincoli di capacity, cioè il limite massimo di masse gestibili.</p>
+              </div></details>
+              <details class="pt"><summary>Aspettative degli investitori sotto controllo</summary><div class="b">
+                <p>Molte strategie attive in formato ETF hanno un tracking error contenuto e tendono a:</p>
+                <ul class="dots"><li>perseguire un alpha moderato;</li><li>contenere il rischio attivo e limitare le sorprese, anche negative;</li><li>mantenere contenuto il ritardo rispetto al benchmark.</li></ul>
+                <p>Guadagni e perdite non pesano allo stesso modo sulle decisioni degli investitori: limitare le sorprese negative aiuta a stabilizzare le masse gestite.</p>
+              </div></details>
+              <details class="pt"><summary>Accesso diretto all'investitore finale</summary><div class="b">
+                <p>La struttura ETF:</p>
+                <ul class="dots"><li>riduce alcune barriere distributive;</li><li>rende il prodotto accessibile a chiunque operi sul mercato di quotazione;</li><li>non prevede retrocessioni, lasciando all'asset manager l'intera commissione di gestione, anche se più bassa.</li></ul>
+                <p>Il valore trattenuto può quindi superare quello delle gestioni attive tradizionali o dei mandati, al netto delle retrocessioni.</p>
+              </div></details>
+            </div>
+            <div>
+              <p class="col-h att"><span>Punti di attenzione</span><span>3</span></p>
+              <details class="pt"><summary>Affollamento dell'offerta</summary><div class="b">
+                <p>Il basso costo di accesso spinge molti asset manager verso gli ETF attivi. Ne possono derivare:</p>
+                <ul class="dots"><li>un numero elevato di prodotti;</li><li>competizione crescente;</li><li>difficoltà a differenziarsi.</li></ul>
+              </div></details>
+              <details class="pt"><summary>Strategie poco differenziate</summary><div class="b">
+                <p>Molti modelli quantitativi a basso tracking error si comportano in modo simile. Diventa più difficile individuare vantaggi competitivi distintivi e cresce il rischio che l'offerta si omogeneizzi.</p>
+              </div></details>
+              <details class="pt"><summary>Concentrazione e “nanismo” dei fondi</summary><div class="b">
+                <p>Senza arrivare ai livelli della gestione passiva pura, il mercato potrebbe sviluppare:</p>
+                <ul class="dots"><li>forte concentrazione degli asset in pochi prodotti e operatori;</li><li>molti ETF di piccole dimensioni;</li><li>elevata mortalità dei fondi nel tempo.</li></ul>
+              </div></details>
+            </div>
+          </div>
+          <div class="verdict"><span class="vn">+</span><p>Per gli asset manager il beneficio è immediato e tangibile: più scalabilità, costi inferiori, marginalità da recuperare.</p></div>
+        </div>
+
+        <!-- Investitori -->
+        <div class="who-panel" id="who-inv" role="tabpanel" hidden>
+          <div class="cols2">
+            <div>
+              <p class="col-h"><span>Benefici</span><span>3</span></p>
+              <details class="pt" open><summary>Costi inferiori alla gestione attiva tradizionale</summary><div class="b">
+                <p>L'ETF attivo si posiziona come soluzione meno costosa rispetto ai fondi attivi tradizionali.</p>
+              </div></details>
+              <details class="pt"><summary>Facilità di accesso</summary><div class="b">
+                <p>Essendo quotato, l'investitore può di norma acquistarlo tramite la propria banca. Viene meno il problema dei mancati accordi distributivi che limita molti fondi.</p>
+              </div></details>
+              <details class="pt"><summary>Operatività intraday</summary><div class="b">
+                <p>Anche fuori da una logica di trading, l'operatività intraday:</p>
+                <ul class="dots"><li>permette di entrare e uscire dal mercato più rapidamente rispetto ai fondi comuni;</li><li>è utile nei ribilanciamenti di portafoglio in consulenza, dove i fondi possono comportare periodi di temporanea assenza dal mercato.</li></ul>
+              </div></details>
+            </div>
+            <div>
+              <p class="col-h att"><span>Punti di attenzione</span><span>4</span></p>
+              <details class="pt" open><summary>Capacità di generare valore</summary><div class="b">
+                <p>Il punto da verificare è se la combinazione di tracking error contenuto, commissioni di 40–50 punti base e alpha atteso modesto basti a creare valore netto per l'investitore. Provalo nel calcolatore qui sotto.</p>
+              </div></details>
+              <details class="pt"><summary>Stretto tra passivo e attivo tradizionale</summary><div class="b">
+                <p>La commissione rischia di assorbire oltre il 50% dell'alpha potenziale. L'investitore potrebbe chiedersi:</p>
+                <ul class="dots"><li>perché non scegliere un ETF passivo, con costi molto più bassi;</li><li>oppure, se cerca vero alpha, perché non una gestione attiva tradizionale.</li></ul>
+              </div></details>
+              <details class="pt"><summary>Più complessità del passivo</summary><div class="b">
+                <p>A differenza di un ETF passivo puro c'è un rischio gestionale: occorre valutare il modello di investimento e monitorarne l'efficacia nel tempo.</p>
+              </div></details>
+              <details class="pt"><summary>Il ruolo dell'AI è ancora da dimostrare</summary><div class="b">
+                <p>Le strategie quantitative non sono una novità. Si sono evolute, ma restano soggette a rischi e a limiti nel generare alpha con continuità. Resta da verificare se i modelli potenziati dall'intelligenza artificiale produrranno più valore che in passato.</p>
+              </div></details>
+            </div>
+          </div>
+
+          <p class="sub-h">Quanto alpha resta al cliente?</p>
+          <div class="calc">
+            <div>
+              <div class="ctrl">
+                <label for="alphaIn">Extra-rendimento lordo atteso <output id="alphaOut" class="num"></output></label>
+                <input type="range" id="alphaIn" min="20" max="300" step="5" value="80">
+                <span class="cap">Punti base all'anno sopra il benchmark, prima della commissione.</span>
+              </div>
+              <div class="ctrl">
+                <label for="feeIn">Commissione di gestione <output id="feeOut" class="num"></output></label>
+                <input type="range" id="feeIn" min="10" max="100" step="5" value="45">
+                <span class="cap">Tipico per gli ETF attivi: 40–50 punti base.</span>
+              </div>
+            </div>
+            <div aria-live="polite">
+              <div class="res-bar" role="img" id="resBar" aria-label="Ripartizione dell'alpha"><div class="fee" id="barFee"></div><div class="net" id="barNet"></div></div>
+              <div class="legend" style="margin-top:0"><span><i style="background:var(--advisor-red)"></i>Va in commissione</span><span><i style="background:var(--chart-1)"></i>Resta al cliente</span></div>
+              <div class="res-big" style="margin-top:18px">
+                <div><div class="n" id="netN"></div><div class="d">alpha netto per il cliente</div></div>
+                <div><div class="n red" id="pctN"></div><div class="d">dell'alpha assorbito dalla commissione</div></div>
+              </div>
+              <p class="res-msg" id="resMsg"></p>
+            </div>
+          </div>
+          <p class="cap" style="margin-top:10px">Esempio illustrativo con valori scelti dall'utente. Non è una stima di rendimento né considera spread, costi di negoziazione e fiscalità.</p>
+
+          <div class="verdict"><span class="vn">?</span><p>Per gli investitori il beneficio è meno evidente: tutto dipende dal valore netto che gli ETF attivi sapranno generare dopo costi e commissioni.</p></div>
+        </div>
+
+        <!-- Consulenti -->
+        <div class="who-panel" id="who-cf" role="tabpanel" hidden>
+          <div class="cols2">
+            <div>
+              <p class="col-h"><span>Consulenti indipendenti</span></p>
+              <details class="pt" open><summary>Beneficio: un universo investibile più ampio</summary><div class="b">
+                <p>Gli ETF attivi possono entrare nei portafogli consigliati perché:</p>
+                <ul class="dots"><li>il cliente li compra facilmente tramite il proprio intermediario, che nel caso dei fondi potrebbe non esserne distributore o preferirne altri;</li><li>non introducono una complessità gestionale particolarmente elevata.</li></ul>
+              </div></details>
+              <details class="pt"><summary>Punto di attenzione: il valore aggiunto va dimostrato</summary><div class="b">
+                <p>L'adozione dipenderà dalla capacità di questi strumenti di dimostrare valore aggiunto nel tempo.</p>
+              </div></details>
+            </div>
+            <div>
+              <p class="col-h"><span>Consulenti finanziari tradizionali</span></p>
+              <details class="pt" open><summary>Modello fee only</summary><div class="b">
+                <p>Valgono considerazioni analoghe a quelle dei consulenti indipendenti, fermo restando che la mandante potrebbe indicare quali ETF attivi utilizzare.</p>
+              </div></details>
+              <details class="pt"><summary>Altri modelli di remunerazione</summary><div class="b">
+                <p>La diffusione degli ETF attivi può incidere sulla redditività dell'attuale modello distributivo, perché la struttura ETF non prevede retrocessioni.</p>
+              </div></details>
+            </div>
+          </div>
+          <div class="verdict"><span class="vn">→</span><p>Per i consulenti gli ETF attivi sono soprattutto una nuova opzione nei modelli fee only.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 -->
+    <section id="scegliere" data-no="07">
+      <div class="prose">
+        <p class="kicker">07 · La due diligence</p>
+        <h2 class="sec">Come si <span class="key">sceglie</span> un ETF</h2>
+        <p>Per un ETF indicizzato si valuta la qualità della replica. Per un ETF attivo serve la stessa due diligence dei fondi attivi, più le verifiche sul veicolo. Usa la checklist durante l'analisi: le spunte restano salvate solo in questo browser.</p>
+      </div>
+      <div class="dd">
+        <div class="dd-head">
+          <div class="seg" role="tablist" aria-label="Tipo di ETF">
+            <button role="tab" data-dd="idx" aria-selected="false">ETF indicizzato</button>
+            <button role="tab" data-dd="act" aria-selected="true">ETF attivo</button>
+          </div>
+          <span class="dd-count num" id="ddCount"></span>
+        </div>
+        <ol class="dd-list" id="ddList"></ol>
+      </div>
+      <div class="box">
+        <span class="box-label">Due filtri decisivi</span>
+        <p>Processo quantitativo o qualitativo? Tracking error basso o elevato?</p>
+        <p>Nei prodotti quantitativi a basso tracking error, modelli diversi possono generare portafogli simili: confronta segnali, vincoli e fonti del rischio attivo prima di scegliere.</p>
+      </div>
+      <p class="cap" style="margin-top:10px">Fonti: Vanguard; BlackRock/iShares; Dimensional; J.P. Morgan AM.</p>
+
+      <h3 class="blk">Le domande da fare all'asset manager</h3>
+      <div class="qs">
+        <div>
+          <div class="grp">Prodotto e processo</div>
+          <div class="q"><span class="no">01</span><div><b>Che tipo di ETF stanno lanciando?</b><span>Strategie attive su segmenti tradizionali, non factor né tematiche?</span></div></div>
+          <div class="q"><span class="no">02</span><div><b>È uno dei loro fondi flagship?</b><span>L'ETF deriva da uno dei fondi di maggior successo della casa (per esempio MAGO di Pictet)?</span></div></div>
+          <div class="q"><span class="no">03</span><div><b>Se la strategia non è nella Sicav, come viene gestita?</b><span>Low tracking error o gestione realmente attiva? Approccio quantitativo o qualitativo?</span></div></div>
+        </div>
+        <div>
+          <div class="grp">Mercato e servizio</div>
+          <div class="q"><span class="no">04</span><div><b>Qual è la strategia commerciale?</b><span>Target: istituzionali, fund buyer, consulenti e distributori?</span></div></div>
+          <div class="q"><span class="no">05</span><div><b>Cambia il modello di servizio?</b><span>C'è una comunicazione e una copertura commerciale dedicata?</span></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sintesi -->
+    <section class="synth" id="sintesi" data-no="08">
+      <span class="box-label">Sintesi</span>
+      <h2>Tre messaggi <span class="key">chiave</span></h2>
+      <div class="msgs">
+        <div class="msg"><div class="who-l">Asset manager</div><div class="lvl">Beneficio immediato</div><p>Il beneficio è tangibile: maggiore scalabilità, costi inferiori e possibilità di recuperare marginalità.</p></div>
+        <div class="msg"><div class="who-l">Investitori</div><div class="lvl">Beneficio da dimostrare</div><p>Il punto centrale sarà verificare la capacità degli ETF attivi di generare valore netto dopo costi e commissioni.</p></div>
+        <div class="msg"><div class="who-l">Consulenti</div><div class="lvl">Una nuova opzione</div><p>Gli ETF attivi rappresentano soprattutto una nuova opzione nei modelli fee only.</p></div>
+      </div>
+    </section>
+
+    <div class="sources">
+      <h3>Fonti</h3>
+      <ol>
+        <li>Morningstar, patrimonio ETF per domicilio e quota attiva, dati al 31 marzo 2026.</li>
+        <li>BlackRock/iShares, <a href="https://www.blackrock.com/au/insights/ishares/authorised-participants-and-market-makers" target="_blank" rel="noopener">Authorised participants and market makers</a>, 15 maggio 2025.</li>
+        <li>State Street, <a href="https://www.ssga.com/us/en/intermediary/resources/education/how-etfs-are-created-and-redeemed" target="_blank" rel="noopener">How ETFs are created and redeemed</a>.</li>
+        <li>ETFGI, <a href="https://etfgi.com/news/press-releases/2026/01/etfgi-reports-assets-global-etf-industry-hit-record-us1985-trillion" target="_blank" rel="noopener">quote di mercato globali a fine dicembre 2025</a>.</li>
+        <li>Trackinsight, <a href="https://www.trackinsight.com/global-etf-survey/2025/industry-data/issuer-rankings" target="_blank" rel="noopener">ranking emittenti Americhe ed EMEA</a>, agosto 2026.</li>
+        <li>Goldman Sachs Asset Management, confronto tra ETF passivi, ETF attivi e fondi comuni, maggio 2026.</li>
+        <li>iShares, <a href="https://www.ishares.com/it/investitore-privato/it/temi-d-investimento/etf-attivi" target="_blank" rel="noopener">ETF attivi</a> e <a href="https://www.ishares.com/it/investitore-privato/it/temi-d-investimento/obbligazionario/discover-ibonds-etfs" target="_blank" rel="noopener">iBonds</a>; Amundi, <a href="https://www.amundietf.it/it/professionali/etf-strategie/etf-attivi" target="_blank" rel="noopener">ETF attivi</a> e <a href="https://www.amundietf.it/it/professionali/etf-strategie/scadenza-fissa" target="_blank" rel="noopener">ETF a scadenza fissa</a>.</li>
+        <li>BNP Paribas Asset Management, tracking error e livelli di gestione attiva negli ETF.</li>
+        <li>Dimensional, <a href="https://www.dimensional.com/us-en/funds/dfac/us-core-equity-2-etf" target="_blank" rel="noopener">US Core Equity 2 ETF (DFAC)</a>; J.P. Morgan AM, <a href="https://am.jpmorgan.com/us/en/asset-management/per/products/jpmorgan-equity-premium-income-etf-etf-shares-46641q332" target="_blank" rel="noopener">JEPI</a>.</li>
+        <li>Vanguard, <a href="https://investor.vanguard.com/investor-resources-education/etfs/etf-vs-mutual-fund" target="_blank" rel="noopener">ETF vs mutual fund</a>.</li>
+      </ol>
+    </div>
+
+    <footer class="foot">
+      <span><b>ADVISOR</b> Market Intelligence</span>
+      <span class="cap">Contenuto a scopo informativo ed educativo per professionisti della consulenza finanziaria. Non costituisce raccomandazione d'investimento. I prodotti citati sono esempi.</span>
+    </footer>
+  </main>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var fmtInt = function (n) { return Math.round(n).toLocaleString("it-IT"); };
+
+  /* Segmenti con selezione singola */
+  function segment(buttons, attr, onPick) {
+    buttons.forEach(function (b) {
+      b.addEventListener("click", function () {
+        buttons.forEach(function (x) { x.setAttribute(attr, x === b ? "true" : "false"); });
+        onPick(b);
+      });
+    });
+  }
+
+  /* 01 · Meccanismo */
+  var actors = {
+    inv: ["Mercato secondario", "Investitori", "Comprano e vendono quote durante la seduta, a un prezzo noto, tramite la propria banca o piattaforma. Non entrano mai in contatto diretto con l'emittente.", "Operano in Borsa, via RFQ o OTC."],
+    borsa: ["Mercato secondario", "Borsa / listing", "La piattaforma di quotazione dove l'ETF si negozia come un'azione. Ogni venue ha i propri market maker e il proprio spread.", "La stessa quota può essere quotata su più listini."],
+    mm: ["Mercato secondario", "Market maker", "Espone prezzi in acquisto e in vendita (bid/ask) sulla singola venue e garantisce che ci sia sempre una controparte.", "Lo spread dipende anche dalla liquidità dei titoli sottostanti."],
+    ap: ["Mercato primario", "Authorized Participant", "Crea e rimborsa quote in grandi blocchi con l'emittente. Quando il prezzo si allontana dal NAV, l'arbitraggio degli AP lo riporta in linea.", "È il meccanismo che tiene il prezzo vicino al valore del portafoglio."],
+    manco: ["Mercato primario", "Issuer / ManCo", "La società che emette l'ETF. Definisce strategia, governance e distribuzione, e accetta le richieste di creazione e rimborso degli AP.", "Per un ETF attivo è anche la casa che firma la strategia."],
+    pm: ["Dentro il fondo", "Portfolio manager", "Gestisce il portafoglio. In un ETF passivo minimizza il tracking error; in un ETF attivo cerca alpha entro un budget di rischio.", "È qui che passivo e attivo si separano."],
+    dep: ["Dentro il fondo", "Depositary", "Custodisce gli asset, monitora i flussi di cassa e svolge funzioni di controllo (oversight) sul fondo.", "Ruolo di garanzia, come nei fondi comuni UCITS."],
+    adm: ["Dentro il fondo", "Administrator", "Calcola il NAV, tiene la contabilità, pubblica il portfolio composition file (PCF) e cura le riconciliazioni.", "Il PCF dice agli AP quali titoli servono per creare una quota."]
+  };
+  function showActor(k) {
+    var a = actors[k];
+    $("#mLabel").textContent = a[0]; $("#mTitle").textContent = a[1];
+    $("#mText").textContent = a[2]; $("#mWhere").textContent = a[3];
+  }
+  segment($$(".node"), "aria-pressed", function (b) { showActor(b.dataset.k); });
+  showActor("inv");
+
+  /* 02 · Barre AUM */
+  var aum = [["Stati Uniti", 13642, "72%"], ["Europa", 3251, "17%"], ["Asia Pacifico", 1282, "7%"], ["Canada", 626, "3%"], ["America Latina", 27, "<1%"]];
+  var max = aum[0][1];
+  $("#aumBars").innerHTML = aum.map(function (r) {
+    var w = Math.max(r[1] / max * 100, 0.6);
+    var cls = "hbar" + (r[0] === "Europa" ? " hl" : "") + (w > 60 ? " inside" : "");
+    return '<div class="' + cls + '" style="--w:0%" data-w="' + w.toFixed(2) + '%"><span class="lab">' + r[0] +
+      '</span><div class="track"><div class="fill"></div><span class="val">' + fmtInt(r[1]) + ' mld · ' + r[2] + '</span></div></div>';
+  }).join("");
+  requestAnimationFrame(function () { requestAnimationFrame(function () {
+    $$("#aumBars .hbar").forEach(function (el) { el.style.setProperty("--w", el.dataset.w); });
+  }); });
+
+  /* 02 · Provider */
+  var prov = {
+    glob: { note: "Le prime tre case gestiscono il 59,5% degli AUM globali.", rows: [["iShares / BlackRock", "5,56", 28.0], ["Vanguard", "4,25", 21.4], ["State Street / SPDR", "1,99", 10.0]] },
+    am: { note: "Dati agosto 2026.", rows: [["iShares", "4,90", 29.7], ["Vanguard", "4,81", 28.2], ["State Street", "2,16", 13.1], ["Invesco", "1,00", 5.7], ["Schwab", "0,62", 3.5], ["J.P. Morgan", "0,35", 2.0]] },
+    emea: { note: "Dati agosto 2026.", rows: [["iShares", "1,55", 40.7], ["Amundi", "0,49", 12.5], ["Xtrackers", "0,41", 10.5], ["Vanguard", "0,30", 7.3], ["UBS", "n.d.", null], ["Invesco", "n.d.", null]] }
+  };
+  function showProv(k) {
+    var p = prov[k];
+    $("#provNote").textContent = p.note;
+    $("#provTbl tbody").innerHTML = p.rows.map(function (r, i) {
+      var sh = r[2] == null ? "n.d." : '<span class="share" style="width:' + (r[2] * 2.4).toFixed(1) + 'px"></span>' + r[2].toFixed(1).replace(".", ",") + "%";
+      return '<tr class="' + (i === 0 ? "top" : "") + '"><td class="num">' + (i + 1) + "</td><td>" + r[0] + '</td><td class="r">' + r[1] + '</td><td class="num">' + sh + "</td></tr>";
+    }).join("");
+  }
+  segment($$("[data-area]"), "aria-selected", function (b) { showProv(b.dataset.area); });
+  showProv("glob");
+
+  /* 03 · Confronto */
+  segment($$("[data-cmp]"), "aria-pressed", function (b) {
+    var f = b.dataset.cmp;
+    $$("#cmpTbl tbody tr").forEach(function (tr) {
+      var match = f === "all" || tr.dataset.s === f;
+      $$("td", tr).forEach(function (td, i) { if (i > 0) td.classList.toggle("dim", !match); });
+    });
+  });
+
+  /* 04 · Tracking error */
+  var te = [
+    ["Molto basso", "Passive", "< 0,5%", "< 0,3%", "Raggiungere caratteristiche simili all'indice.", "Veicolo tipico: ETF indicizzati"],
+    ["Basso", "Alpha enhanced", "1–2%", "0,5–1%", "Limitare il rischio idiosincratico nel portafoglio.", "Veicolo tipico: ETF quantitativi"],
+    ["Medio", "Core active", "3–5%", "1–2%", "Massimizzare i rendimenti con un budget di tracking error limitato.", "Veicolo tipico: ETF fondamentali"],
+    ["Alto", "High conviction", "> 5%", "> 2%", "Massima discrezionalità del gestore, con il portafoglio più distante dall'indice.", "Veicolo tipico: fondi comuni"]
+  ];
+  function showTe(i) {
+    var t = te[i];
+    $("#teBand").textContent = "Tracking error " + t[0].toLowerCase();
+    $("#teName").textContent = t[1];
+    $("#teEq").textContent = t[2]; $("#teBd").textContent = t[3];
+    $("#teObj").textContent = t[4]; $("#teVehicle").textContent = t[5];
+    $("#teRange").setAttribute("aria-valuetext", t[1] + ", tracking error " + t[0].toLowerCase());
+    var hi = i >= 2;
+    $$("#dims .s.lo").forEach(function (e) { e.classList.toggle("on", !hi); });
+    $$("#dims .s.hi").forEach(function (e) { e.classList.toggle("on", hi); });
+  }
+  $("#teRange").addEventListener("input", function (e) { showTe(+e.target.value); });
+  showTe(1);
+
+  /* 05 · Modelli */
+  segment($$("[data-f]").filter(function (b) { return b.tagName === "BUTTON"; }), "aria-pressed", function (b) {
+    var f = b.dataset.f;
+    $$("#modTbl tbody tr").forEach(function (tr) { tr.hidden = !(f === "all" || tr.dataset.f === f); });
+  });
+
+  /* 06 · Punto di vista */
+  segment($$("[data-who]"), "aria-selected", function (b) {
+    $$(".who-panel").forEach(function (p) { p.hidden = p.id !== "who-" + b.dataset.who; });
+  });
+
+  /* 06 · Calcolatore */
+  function calc() {
+    var a = +$("#alphaIn").value, f = +$("#feeIn").value;
+    var net = a - f, pct = f / a * 100;
+    $("#alphaOut").textContent = a + " pb"; $("#feeOut").textContent = f + " pb";
+    var feeW = Math.min(f / a, 1) * 100;
+    $("#barFee").style.width = feeW + "%";
+    $("#barNet").style.width = Math.max(100 - feeW, 0) + "%";
+    $("#resBar").setAttribute("aria-label", "Commissione " + Math.round(Math.min(pct, 100)) + "% dell'alpha");
+    $("#netN").innerHTML = (net > 0 ? "+" : net < 0 ? "−" : "") + Math.abs(net) + "<small>pb</small>";
+    $("#netN").classList.toggle("red", net < 0);
+    $("#pctN").innerHTML = (pct > 100 ? ">100" : Math.round(pct)) + "<small>%</small>";
+    var m;
+    if (net <= 0) m = "La commissione supera l'extra-rendimento: per il cliente il risultato netto è pari o inferiore al benchmark.";
+    else if (pct > 50) m = "La commissione assorbe più di metà dell'alpha. È lo scenario in cui il cliente può chiedersi perché non scegliere un ETF passivo.";
+    else if (pct > 33) m = "Al cliente resta la quota maggiore dell'alpha, ma il margine di errore è ridotto: basta un anno debole per azzerarlo.";
+    else m = "La maggior parte dell'alpha resta al cliente. Serve però un gestore capace di produrlo con continuità.";
+    $("#resMsg").textContent = m;
+  }
+  ["#alphaIn", "#feeIn"].forEach(function (s) { $(s).addEventListener("input", calc); });
+  calc();
+
+  /* 07 · Checklist */
+  var dd = {
+    idx: [["Esposizione", "Indice, universo, valuta, duration, concentrazione."], ["Replica", "Fisica, a campionamento o sintetica; collateral e controparte."], ["Costi totali", "TER, spread, commissioni di negoziazione, tracking difference."], ["Qualità di replica", "Tracking difference, tracking error, fiscal drag."], ["Liquidità", "Sottostanti, spread, quoted size, AP e market maker."], ["Struttura", "Domicilio, UCITS, securities lending, distribuzione o accumulo."]],
+    act: [["Obiettivo", "Alpha, reddito, controllo del downside o accesso a un mercato."], ["Processo", "Ripetibile e disciplinato, con capacity e vincoli chiari."], ["Persone", "Team, anzianità, responsabilità, piano di successione."], ["Portafoglio", "Active share, tracking error, turnover, concentrazione."], ["Risultati", "Performance netta, drawdown, hit rate, analisi di scenario."], ["Wrapper", "Trasparenza, basket, capacità di AP e market maker, pricing intraday."]]
+  };
+  var KEY = "advisor-etf-attivi-dd";
+  var state = {};
+  try { state = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) { state = {}; }
+  var cur = "act";
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  function renderDd() {
+    var items = dd[cur];
+    $("#ddList").innerHTML = items.map(function (it, i) {
+      var id = "dd-" + cur + "-" + i;
+      return '<li><label for="' + id + '"><input type="checkbox" id="' + id + '" data-i="' + i + '"' + (state[id] ? " checked" : "") +
+        '><span><span class="t">' + (i + 1) + ". " + it[0] + '</span><span class="x">' + it[1] + "</span></span></label></li>";
+    }).join("");
+    count();
+  }
+  function count() {
+    var n = $$("#ddList input:checked").length;
+    $("#ddCount").textContent = n + " di 6 verifiche completate";
+  }
+  $("#ddList").addEventListener("change", function (e) {
+    if (e.target.type !== "checkbox") return;
+    state[e.target.id] = e.target.checked; save(); count();
+  });
+  segment($$("[data-dd]"), "aria-selected", function (b) { cur = b.dataset.dd; renderDd(); });
+  renderDd();
+
+  /* Navigazione: progresso e sezione attiva */
+  var secs = $$("main section[id]");
+  var links = $$(".topnav a");
+  function onScroll() {
+    var h = document.documentElement;
+    var p = h.scrollTop / Math.max(h.scrollHeight - h.clientHeight, 1);
+    $("#progress").style.width = (p * 100).toFixed(1) + "%";
+    var y = window.scrollY + 140, active = null;
+    secs.forEach(function (s) { if (s.offsetTop <= y) active = s; });
+    links.forEach(function (a) { a.classList.toggle("on", !!active && a.getAttribute("href") === "#" + active.id); });
+    var rn = $("#railNo"); if (rn) rn.textContent = active ? active.dataset.no : "00";
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+})();
+</script>
+</body>
+</html>
