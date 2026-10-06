@@ -1,7 +1,8 @@
 """Grafici TV (16:9) dall'Indagine sul Risparmio 2026 - stile ADVISOR.
 
 Genera per ogni figura un PNG 1920x1080 e un PNG 3840x2160 (UHD).
-Uso: python3 build_charts.py [cartella_font] [logo_bianco.png]
+Uso: python3 build_charts.py [cartella_font] [cartella_logo]
+Produce due versioni: fondo scuro e fondo bianco (suffisso _bianco).
 """
 import os
 import sys
@@ -16,7 +17,8 @@ import matplotlib.image as mpimg
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 FONT_DIR = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "fonts")
-LOGO = sys.argv[2] if len(sys.argv) > 2 else os.path.join(HERE, "advisor-logo-white.png")
+LOGO_DIR = sys.argv[2] if len(sys.argv) > 2 else HERE
+LOGO = os.path.join(LOGO_DIR, "advisor-logo-white.png")
 OUT = os.path.join(HERE, "output")
 os.makedirs(OUT, exist_ok=True)
 
@@ -38,6 +40,25 @@ CYAN = "#04ACC8"
 LIGHT = "#F2F2F2"
 GREY = "#A2A3A3"
 POS = "#C4D4F8"  # barre positive
+GAP = "#1C1C1C"  # fascia anni mancanti
+SUFFIX = ""
+
+THEMES = {
+    "scuro": dict(BG="#101010", INK="#FFFFFF", INK2="#C8C8C8", MUTED="#8A8B8C",
+                  GRID="#2A2A2A", AXIS="#5A5A5A", CYAN="#04ACC8", LIGHT="#F2F2F2",
+                  GREY="#A2A3A3", POS="#C4D4F8", GAP="#1C1C1C",
+                  LOGO="advisor-logo-white.png", SUFFIX=""),
+    "bianco": dict(BG="#FFFFFF", INK="#000000", INK2="#404040", MUTED="#707172",
+                   GRID="#E6E6E6", AXIS="#8A8A8A", CYAN="#0391AA", LIGHT="#282C34",
+                   GREY="#505864", POS="#80889C", GAP="#F0F0F0",
+                   LOGO="advisor-logo.png", SUFFIX="_bianco"),
+}
+
+
+def use_theme(name):
+    t = dict(THEMES[name])
+    t["LOGO"] = os.path.join(LOGO_DIR, t["LOGO"])
+    globals().update(t)
 
 W, H = 1920, 1080
 FONTE = "Fonte: Indagine sul Risparmio e sulle scelte finanziarie degli italiani 2026, Centro Einaudi"
@@ -64,7 +85,7 @@ def frame(title, subtitle, source=FONTE, note=None):
     # etichetta
     ov.add_patch(FancyBboxPatch((96, 52), 470, 44, boxstyle="round,pad=0,rounding_size=0",
                                 color=RED_CORP, lw=0))
-    ov.text(112, 75, "INDAGINE SUL RISPARMIO 2026", color=INK, fontsize=pt(21),
+    ov.text(112, 75, "INDAGINE SUL RISPARMIO 2026", color="#FFFFFF", fontsize=pt(21),
             fontweight="bold", va="center")
     # logo
     if os.path.exists(LOGO):
@@ -120,14 +141,14 @@ def legend_row(ov, items, x, y, gap=60):
 
 
 def save(fig, name):
-    fig.savefig(os.path.join(OUT, f"{name}.png"), dpi=100, facecolor=BG)
-    fig.savefig(os.path.join(OUT, f"{name}_4K.png"), dpi=200, facecolor=BG)
+    fig.savefig(os.path.join(OUT, f"{name}{SUFFIX}.png"), dpi=100, facecolor=BG)
+    fig.savefig(os.path.join(OUT, f"{name}{SUFFIX}_4K.png"), dpi=200, facecolor=BG)
     plt.close(fig)
 
 
-def label(ax, x, y, text, dy, color=INK, size=26, weight="bold", ha="center"):
+def label(ax, x, y, text, dy, color=None, size=26, weight="bold", ha="center"):
     ax.annotate(text, (x, y), xytext=(0, dy), textcoords="offset pixels", ha=ha,
-                va="bottom" if dy > 0 else "top", color=color, fontsize=pt(size),
+                va="bottom" if dy > 0 else "top", color=color or INK, fontsize=pt(size),
                 fontweight=weight)
 
 
@@ -289,7 +310,7 @@ def fig_2_9b():
     # interruzione della serie
     gx = 10
     for a in (ax1, ax2):
-        a.axvspan(gx - 0.45, gx + 0.45, color="#1C1C1C", lw=0, zorder=0)
+        a.axvspan(gx - 0.45, gx + 0.45, color=GAP, lw=0, zorder=0)
     ax2.text(gx, -26, "2008-\n2010\nn.d.", ha="center", va="top", color=MUTED,
              fontsize=pt(15), style="italic")
     save(fig, "fig_2-9b_soddisfazione_azioni")
@@ -348,9 +369,11 @@ def fig_2_11a():
 
 
 if __name__ == "__main__":
-    fig_2_7()
-    fig_2_8a()
-    fig_2_9a()
-    fig_2_9b()
-    fig_2_11a()
+    for theme in THEMES:
+        use_theme(theme)
+        fig_2_7()
+        fig_2_8a()
+        fig_2_9a()
+        fig_2_9b()
+        fig_2_11a()
     print("ok ->", OUT)
