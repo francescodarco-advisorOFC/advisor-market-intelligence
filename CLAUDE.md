@@ -19,6 +19,9 @@ Per le presentazioni parti sempre da `design/powerpoint/Template ADVISOR.potx`
 (layout Copertina, Sezione, Titolo e testo, Testo e immagine, Solo titolo, Chiusura;
 esempi di barre etichetta, callout, cifre chiave, grafico a ciambella e tabella).
 Titoli delle slide su una sola riga.
+Per i PDF parti sempre da `design/pdf/template-report.html` (copertina, testatina,
+piè di pagina con "Pagina X di Y", tutti gli stili) e convertilo con
+`design/pdf/build-pdf.sh <file.html> <file.pdf>`: A4, font incorporati.
 
 ### Un solo font: Baskerville
 
