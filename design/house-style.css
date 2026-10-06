@@ -1,0 +1,60 @@
+/* House style — vedi CLAUDE.md. Fonte unica dei token visivi. */
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=JetBrains+Mono:wght@400;500&family=Schibsted+Grotesk:wght@400;500;600&display=swap");
+
+:root {
+  --paper: #F3EFE6;
+  --ink: #16161A;
+  --ink-muted: #5E5A52;
+  --rule: #D8D1C2;
+  --accent: #C2410C;
+  --deep: #0F3D3E;
+  --ochre: #B8892B;
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Schibsted Grotesk", "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-mono: "JetBrains Mono", Consolas, Menlo, monospace;
+
+  --radius: 2px;
+  --hairline: 1px solid var(--rule);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #14140F; --ink: #ECE6D8; --ink-muted: #A39C8C;
+    --rule: #2E2C26; --accent: #F07A3E; --deep: #5FA8A0; --ochre: #D6A84A;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #14140F; --ink: #ECE6D8; --ink-muted: #A39C8C;
+  --rule: #2E2C26; --accent: #F07A3E; --deep: #5FA8A0; --ochre: #D6A84A;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 17px/1.55 var(--font-body);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 350;
+  font-variation-settings: "opsz" 144;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+h1 em, h2 em { font-style: italic; color: var(--accent); }
+
+.eyebrow {
+  font: 500 11px/1 var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.kpi { font-family: var(--font-display); font-weight: 300; font-size: clamp(48px, 8vw, 96px); line-height: 1; }
+.num, table td { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+hr, .rule { border: 0; border-top: var(--hairline); }
+table { border-collapse: collapse; }
+th, td { border-bottom: var(--hairline); padding: 0.6em 1em 0.6em 0; text-align: left; }
+th { font: 500 11px var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); }
