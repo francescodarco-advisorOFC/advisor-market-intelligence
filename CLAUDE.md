@@ -4,63 +4,88 @@
 
 Vale per **ogni** documento o artefatto prodotto per questo progetto: pagine HTML,
 artifact, presentazioni (slide, .pptx), documenti (Docs, .docx), PDF, grafici,
-report ed email formattate. L'obiettivo è un'identità editoriale riconoscibile,
-**lontana dallo stile "di default"** (niente Inter/Roboto/Arial, niente card
-arrotondate con ombre, niente gradienti viola-blu, niente emoji come icone).
+report ed email formattate.
 
-La fonte unica dei valori è `design/house-style.css`: per le pagine HTML
-copiala o includila; per gli altri formati riporta gli stessi valori.
+Lo stile replica **solo ed esclusivamente** l'identità grafica di ADVISOR, ricavata
+da due riferimenti: la rivista *ADVISOR – Newsmagazine della consulenza finanziaria*
+(luglio/agosto 2026) e la presentazione corporate ADVISOR. Non aggiungere elementi,
+font o colori che non compaiono lì (niente gradienti, ombre, emoji, icone decorative,
+palette inventate). I valori pronti per l'HTML sono in `design/house-style.css`;
+la pagina `design/prova-stile-advisor.html` mostra tutto applicato.
 
-### Carattere: "rivista finanziaria"
+### Quale registro usare
 
-- Editoriale e asciutto, come un report di ricerca stampato, non come un'app SaaS.
-- Gerarchia data dalla tipografia e dallo spazio bianco, non da box e colori.
-- Filetti sottili (hairline 1px) al posto di bordi pesanti e ombre.
-- Angoli vivi (border-radius 0–2px). Nessun drop shadow, nessun glassmorphism.
-- Layout asimmetrico: colonna stretta a sinistra per etichette/note a margine,
-  colonna larga per il testo. Allineamento a sinistra, mai testo giustificato centrato.
+| Deliverable | Registro |
+|---|---|
+| Presentazioni, slide, one-pager commerciali | **Corporate** (fondo scuro, Montserrat, rosso pieno) |
+| Report, documenti Word/Docs, PDF, articoli, pagine HTML, newsletter | **Rivista** (fondo bianco, Druk + Baskerville + Inter) |
 
-### Font
+### Logo / testata
 
-| Ruolo | Font | Fallback (se non incorporabile) |
-|---|---|---|
-| Titoli / display | **Fraunces** (serif variabile, opsz alto, peso 300–600, corsivo per enfasi) | Georgia |
-| Testo corrente | **Schibsted Grotesk** (400/500) | Segoe UI, Helvetica Neue |
-| Numeri, dati, etichette tecniche | **JetBrains Mono** (400/500) con cifre tabulari | Consolas, Menlo |
-
-- Titoli grandi e leggeri (Fraunces 300–400), interlinea stretta (1.05), tracking leggermente negativo.
-- Occhielli/etichette sopra i titoli: maiuscoletto in JetBrains Mono, 11–12px,
-  letter-spacing 0.12em, colore accento. Es. `01 — MERCATO`.
-- KPI e cifre chiave: numeri molto grandi in Fraunces, unità e didascalia in mono piccolo.
-- Numerazione delle sezioni in stile editoriale (`01`, `02`, …).
+`ADVISOR` in maiuscolo, lettere spaziate, grigio `#707172`; la **O** in rosso `#E53446`.
+Sotto, nella rivista: `NEWSMAGAZINE DELLA CONSULENZA FINANZIARIA` in maiuscolo piccolo, nero.
+Nella presentazione il logo è bianco, in alto a destra.
 
 ### Colori
 
-| Token | Valore | Uso |
+| Token | Valore | Dove |
 |---|---|---|
-| `--paper` | `#F3EFE6` | sfondo (carta calda, mai bianco puro) |
-| `--ink` | `#16161A` | testo principale |
-| `--ink-muted` | `#5E5A52` | testo secondario, didascalie |
-| `--rule` | `#D8D1C2` | filetti e separatori |
-| `--accent` | `#C2410C` | vermiglio: un solo accento, usato con parsimonia |
-| `--deep` | `#0F3D3E` | verde petrolio: secondo colore, blocchi di contrasto |
-| `--ochre` | `#B8892B` | ocra: terzo colore per grafici/evidenziazioni |
+| `--advisor-red` | `#E53446` | rosso della rivista: O del logo, box titolo "Radici profonde" |
+| `--corp-red` | `#BA0100` | rosso pieno della presentazione: barre, filetti sotto i titoli, punti elenco, mezzo anello |
+| `--logo-grey` | `#707172` | logo, capolettera |
+| `--black` | `#000000` | testi rivista, box approfondimento, filetti |
+| `--white` | `#FFFFFF` | fondo rivista, testi su scuro |
+| `--corp-bg` | `#101010` | fondo slide |
 
-Modalità scura: sfondo `#14140F` (nero caldo, mai `#000`), testo `#ECE6D8`,
-accento `#F07A3E`, petrolio `#5FA8A0`, filetti `#2E2C26`.
+Grafici (dalla presentazione, nell'ordine): `#282C34`, `#505864`, `#80889C`, `#C8303F`,
+`#A2A3A3`, `#D8D8D8`; accenti secondari `#04ACC8`, `#C4D4F8`. Etichette legenda in
+Montserrat Regular bianco con la percentuale tra parentesi, quadratino colore a sinistra.
+Ciambelle (donut) spesse, senza bordi.
 
-Grafici: palette nell'ordine petrolio, vermiglio, ocra, `#7A7466`, `#9DB8B0`;
-assi e griglie in `--rule`, etichette in JetBrains Mono, nessun bordo attorno al grafico.
+### Font
 
-### Regole per formato
+| Font originale | Uso | Sostituto web (Google Fonts) |
+|---|---|---|
+| **Druk Text** (Medium, Bold, Super) | titoli rivista in MAIUSCOLO, cifre giganti, occhielli di copertina | **Anton** |
+| **Baskerville** (Regular, Italic, SemiBold) | testo corrente rivista; *corsivo* per citazioni e pull-quote | **Libre Baskerville** |
+| **Inter** (Light, Regular, SemiBold, Bold) | domande d'intervista, didascalie, firma, testatine, box approfondimento | **Inter** |
+| **Montserrat** (Regular, SemiBold, Bold) | tutto nelle presentazioni | **Montserrat** |
+| Aptos / Arial | testi minori nelle slide (Office) | Montserrat |
 
-- **HTML / artifact**: Google Fonts (Fraunces, Schibsted Grotesk, JetBrains Mono);
-  token CSS da `design/house-style.css`; max-width testo ~68ch.
-- **Presentazioni**: sfondo carta, una idea per slide, titolo Fraunces grande
-  allineato in alto a sinistra, numero slide in mono in basso a destra, una slide
-  "di rottura" a tutto campo petrolio per ogni capitolo. Mai template stock.
-- **Word / Docs**: titoli Fraunces, corpo Schibsted Grotesk 10.5pt interlinea 1.4,
-  margini ampi, tabelle senza griglia verticale (solo filetti orizzontali).
-  Se i font non possono essere incorporati usa i fallback indicati.
-- **PDF**: incorpora sempre i font; stesso impianto dei documenti.
-- Icone: lineari, tratto sottile (es. Lucide/Phosphor "thin"), mai emoji.
+Druk e Baskerville sono font commerciali: usa i sostituti nel web; nei file Office/PDF usa
+gli originali se installati, altrimenti i sostituti.
+
+### Registro Rivista (documenti, report, pagine)
+
+- Fondo bianco, testo nero. Colonne strette di testo, allineato a sinistra con sillabazione.
+- **Titolo**: Anton/Druk maiuscolo, nero, interlinea molto stretta (~0.95); l'ultima parola
+  chiave del titolo più grande e in contrasto (bianco su foto, oppure rosso su bianco).
+  Sotto: filetto nero sottile e firma `di **Nome Cognome**` in Inter (Regular + SemiBold).
+- **Testo**: Libre Baskerville ~10pt (16px a schermo), interlinea 1.5.
+- **Domande / sottotitoli interni**: Inter SemiBold, nero, stessa misura del testo.
+- **Capolettera**: Anton grigio `#707172`, alto 4–5 righe.
+- **Citazione**: Libre Baskerville *corsivo*, grande, con virgolette “ ”, attribuzione in corsivo.
+- **Cifra chiave**: numero gigante Anton nero, `%` piccolo accanto, didascalia in Inter SemiBold
+  centrata sotto (es. `60%` – "Il peso delle prime dieci posizioni…").
+- **Testatina verticale** sul margine: `In prima persona` (Inter SemiBold) in alto,
+  `ADVISOR luglio/agosto 2026` (ADVISOR in Inter Bold, data in Inter Light) e numero pagina
+  in Inter Bold, separati dal testo da un filetto verticale nero.
+- **Box approfondimento**: fondo nero, titolo in Inter SemiBold bianco su etichetta
+  rossa `#E53446`, testo Inter Light bianco.
+- **Occhielli di copertina**: Anton maiuscolo grigio scuro sopra filetto nero, sottotitolo Inter Light.
+
+### Registro Corporate (presentazioni)
+
+- Formato 16:9, fondo `#101010`, foto di sfondo in bianco e nero scurite.
+- Logo `ADVISOR` bianco in alto a destra; numero pagina piccolo in basso a destra.
+- Bordo sinistro: barra verticale rossa `#BA0100` e mezzo anello rosso all'altezza del titolo.
+- **Titolo**: Montserrat SemiBold bianco grande; sottotitolo Montserrat Regular sotto.
+- **Testo**: Montserrat Regular bianco, parole chiave in Bold.
+- **Intestazione di blocco**: Montserrat SemiBold bianco con filetto rosso spesso sotto.
+- **Barre etichetta**: rettangoli rosso pieno, angoli destri arrotondati, testo Montserrat Bold
+  bianco MAIUSCOLO; accanto cifra grande Montserrat Bold (es. `10ª Edizione`).
+- **Elenchi**: pallino rosso.
+- **Callout**: riquadro bianco con angolo arrotondato, testo Montserrat Bold rosso centrato,
+  triangolo rosso sul vertice in alto a sinistra.
+- Freccia/triangolo rosso come segnaposto; banner a freccia grigio chiaro `#D8D8D8` con testo nero.
+- Foto con angoli arrotondati.
