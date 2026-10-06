@@ -1,0 +1,382 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8">
+<title>Infografica Risparmio 2026</title><style>
+@font-face { font-family: 'Druk'; src: url('fonts/anton-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Druk'; src: url('fonts/anton-latin-ext-400-normal.woff2') format('woff2');
+  unicode-range: U+0100-024F; }
+@font-face { font-family: 'Inter'; font-weight: 300; src: url('fonts/inter-latin-300-normal.woff2'); }
+@font-face { font-family: 'Inter'; font-weight: 400; src: url('fonts/inter-latin-400-normal.woff2'); }
+@font-face { font-family: 'Inter'; font-weight: 500; src: url('fonts/inter-latin-500-normal.woff2'); }
+@font-face { font-family: 'Inter'; font-weight: 600; src: url('fonts/inter-latin-600-normal.woff2'); }
+@font-face { font-family: 'Inter'; font-weight: 700; src: url('fonts/inter-latin-700-normal.woff2'); }
+@font-face { font-family: 'Bask'; font-style: italic; src: url('fonts/LibreBaskerville-Italic.ttf'); }
+@page { size: 225mm 285mm; margin: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #FFFFFF; color: #000; font-family: 'Inter', sans-serif; }
+.page { width: 225mm; height: 285mm; position: relative; overflow: hidden; background: #FFF;
+  page-break-after: always; }
+.abs { position: absolute; }
+/* testatina verticale */
+.rule { position: absolute; top: 15mm; bottom: 15.5mm; width: 0; border-left: 0.3mm solid #000; }
+.vert { position: absolute; white-space: nowrap; transform-origin: left top; font-size: 11.5pt; }
+.rubrica { font-weight: 600; font-size: 13pt; }
+.pnum { position: absolute; font-weight: 700; font-size: 12pt; }
+/* titoli */
+.title { font-family: 'Druk'; text-transform: uppercase; font-size: 17.5mm; line-height: 1.06;
+  letter-spacing: -0.1mm; color: #000; }
+.title .hl { background: #E53446; color: #FFF; padding: 0.6mm 1.6mm 0; display: inline-block; line-height: 0.94; }
+.deck { font-family: 'Bask'; font-style: italic; font-size: 15.5pt; line-height: 1.38; }
+.byline { font-size: 11pt; } .byline b { font-weight: 600; }
+.h2 { font-family: 'Druk'; text-transform: uppercase; color: #041C37; font-size: 8.2mm;
+  line-height: 1.06; }
+.h3 { font-family: 'Druk'; text-transform: uppercase; color: #041C37; font-size: 7mm;
+  line-height: 1.08; }
+.sub { font-size: 8.5pt; color: #222; }
+.src { font-size: 8.5pt; font-weight: 500; }
+.note { font-size: 7pt; color: #444; }
+svg text { font-family: 'Inter'; }
+.cap { font-size: 2.6px; font-weight: 600; fill: #555; }
+.lab { font-size: 3.15px; fill: #000; }
+.val { font-family: 'Druk' !important; font-size: 4.3px; }
+.ytd { font-size: 3.1px; font-weight: 600; fill: #6E6E6E; }
+.donut-c { font-family: 'Druk' !important; font-size: 5.4px; fill: #041C37; }
+.big { font-family: 'Druk'; line-height: 0.9; }
+.vline { position: absolute; border-left: 0.25mm solid #C6C7C8; }
+/* elenco con cerchi */
+.li { display: flex; align-items: center; gap: 3.5mm; margin-bottom: 3.2mm; }
+.circ { width: 14mm; height: 14mm; border-radius: 50%; background: #041C37; color: #FFF;
+  font-family: 'Druk'; font-size: 4.9mm; display: flex; align-items: center; justify-content: center;
+  flex: none; letter-spacing: -0.1mm; }
+.li-body { flex: 1; }
+.li-lab { font-size: 9.5pt; margin-bottom: 1.4mm; }
+.track { height: 5mm; background: #C6C7C8; }
+.fill { height: 100%; background: #041C37; }
+/* pagina 2 */
+.hero { font-family: 'Druk'; color: #E53446; font-size: 38mm; line-height: 0.9; letter-spacing: -0.6mm; }
+.hlines span { background: #E53446; color: #FFF; font-weight: 500; font-size: 20pt; line-height: 1.52;
+  padding: 0.3mm 1.6mm 0.6mm 0.4mm; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.panel { position: absolute; background: #041C37; color: #FFF; }
+.pan-h { font-size: 3.1px; font-weight: 600; fill: #FFFFFF; letter-spacing: 0.08px; }
+.pan-v { font-size: 3.6px; font-weight: 700; }
+.pan-b { font-size: 2.55px; font-weight: 600; fill: #FFFFFF; }
+.pan-y { font-size: 2.6px; fill: #B9C2CF; }
+.dot { display: inline-block; width: 3mm; height: 3mm; border-radius: 50%; background: #E53446;
+  margin-right: 2mm; vertical-align: -0.4mm; }
+.cmp-lab { font-size: 9.5pt; } .cmp-lab b { font-weight: 700; }
+.cmp { display: flex; align-items: flex-end; justify-content: space-between; margin-top: 4mm; }
+.cmp .n { font-family: 'Druk'; font-size: 12.5mm; line-height: 0.9; }
+.cmp .y { font-size: 9pt; font-weight: 700; margin-top: 2mm; }
+.dots { border-top: 0.5mm dotted #BBB; }
+.az { display: flex; align-items: center; height: 15.6mm; border-bottom: 0.5mm dotted #BBB;
+  padding: 0 2mm; }
+.az:last-child { border-bottom: none; }
+.az.hl { background: #D9DADB; border-bottom: none; margin-bottom: 1.4mm; }
+.az-ic { width: 16mm; flex: none; display: flex; justify-content: center; }
+.az-v { font-family: 'Druk'; font-size: 9.6mm; width: 30mm; flex: none; padding-left: 3mm;
+  letter-spacing: -0.2mm; }
+.az-l { font-size: 9pt; font-weight: 600; line-height: 1.25; }
+.az.hl .az-l { font-weight: 400; font-size: 8.5pt; }
+.kn { display: flex; align-items: center; gap: 3mm; margin-bottom: 3.2mm; }
+.kn .n { font-family: 'Druk'; font-size: 11mm; width: 30mm; flex: none; line-height: 1; }
+.kn .bar { height: 6mm; }
+.kn .t { font-size: 9pt; line-height: 1.3; }
+</style></head>
+<body>
+<section class="page">
+  <div class="rule" style="left:14.4mm"></div>
+  <div class="vert rubrica" style="left:5.4mm; top:44mm; transform: rotate(-90deg);">L’infografica</div>
+  <div class="vert" style="left:5.4mm; top:166mm; transform: rotate(-90deg);"><b>ADVISOR</b> ottobre 2026</div>
+  <div class="pnum" style="left:5mm; top:262mm; transform: rotate(-90deg); transform-origin:left top;">30</div>
+
+  <div class="abs title" style="left:25mm; top:15mm; width:190mm;">
+    Risparmio 2026:<br>dalla <span class="hl">cautela</span><br>all’azione</div>
+
+  <div class="abs deck" style="left:25mm; top:76mm; width:110mm;">
+    Nel 2025 i mercati hanno premiato chi ha osato: l’oro ha reso il 45,7 per cento,
+    le azioni dell’Eurozona il 22,4. Ma gli italiani restano prudenti e il risparmio
+    gestito è la via d’ingresso al rischio</div>
+  <div class="abs byline" style="left:25mm; top:117mm;">di <b>Nome Cognome</b></div>
+
+  <!-- obbligazioni: ciambella -->
+  <div class="abs h3" style="left:143mm; top:75mm; width:66mm; font-size:6mm;">Obbligazioni:<br>quanto pesano</div>
+  <div class="abs" style="left:143mm; top:90mm;"><svg width="30.0mm" height="30.0mm" viewBox="0 0 30.0 30.0">
+      <circle cx="15.0" cy="15.0" r="11.5" fill="none" stroke="#041C37" stroke-width="6"/>
+      <circle cx="15.0" cy="15.0" r="11.5" fill="none" stroke="#E53446" stroke-width="6"
+        stroke-dasharray="19.509 72.257" transform="rotate(-90 15.0 15.0)"/>
+      <text x="15.0" y="16.6" text-anchor="middle" class="donut-c">2026</text></svg></div>
+  <div class="abs" style="left:178mm; top:106mm; width:32mm;">
+    <div class="big" style="font-size:8.5mm; color:#041C37;">73%</div>
+    <div style="font-size:7.5pt; font-weight:600; line-height:1.2;">altre attività</div></div>
+  <div class="abs" style="left:178mm; top:91mm; width:32mm;">
+    <div class="big" style="font-size:8.5mm; color:#E53446;">27%</div>
+    <div style="font-size:7.5pt; font-weight:600; line-height:1.2;">obbligazioni</div></div>
+  <div class="abs" style="left:143mm; top:122mm; width:66mm; font-size:8pt; line-height:1.35;">
+    Peso delle obbligazioni nel portafoglio di chi le possiede. I possessori sono
+    il <b>24%</b> degli intervistati (14% nel 2016)</div>
+
+  <!-- sezione rendimenti -->
+  <div class="abs" style="left:23mm; top:126mm;"><svg width="15mm" height="15mm" viewBox="0 0 100 100">
+      <path d="M50 0 C53 38 62 47 100 50 C62 53 53 62 50 100 C47 62 38 53 0 50 C38 47 47 38 50 0Z" fill="#AFA599"/></svg></div>
+  <div class="abs h2" style="left:38mm; top:133mm; width:80mm;">I rendimenti<br>delle asset class<br>nel 2025</div>
+  <div class="abs" style="left:25mm; top:164mm;"><svg width="104mm" height="76.39999999999999mm" viewBox="0 0 104 76.39999999999999">
+<text x="40" y="4" class="cap">2025</text>
+<text x="104" y="4" class="cap" text-anchor="end">2026*</text>
+<text x="0" y="11.9" class="lab">Oro (in euro)</text>
+<rect x="40" y="8.6" width="37.00" height="4.8" fill="#E53446"/>
+<text x="78.40" y="12.9" class="val" fill="#E53446">+45,7%</text>
+<text x="104" y="12.4" class="ytd" text-anchor="end">+12,3</text>
+<line x1="0" x2="104" y1="15.2" y2="15.2" stroke="#C6C7C8" stroke-width="0.25" stroke-dasharray="0.6 0.6"/>
+<text x="0" y="19.5" class="lab">Azioni Eurozona</text>
+<rect x="40" y="16.2" width="18.14" height="4.8" fill="#041C37"/>
+<text x="59.54" y="20.5" class="val" fill="#041C37">+22,4%</text>
+<text x="104" y="20.0" class="ytd" text-anchor="end">+5,8</text>
+<line x1="0" x2="104" y1="22.8" y2="22.8" stroke="#C6C7C8" stroke-width="0.25" stroke-dasharray="0.6 0.6"/>
+<text x="0" y="27.099999999999998" class="lab">Azioni mondiali in euro</text>
+<rect x="40" y="23.8" width="13.36" height="4.8" fill="#041C37"/>
+<text x="54.76" y="28.1" class="val" fill="#041C37">+16,5%</text>
+<text x="104" y="27.6" class="ytd" text-anchor="end">+6,3</text>
+<line x1="0" x2="104" y1="30.4" y2="30.4" stroke="#C6C7C8" stroke-width="0.25" stroke-dasharray="0.6 0.6"/>
+<text x="0" y="34.699999999999996" class="lab">Portafoglio diversificato</text>
+<rect x="40" y="31.4" width="9.23" height="4.8" fill="#041C37"/>
+<text x="50.63" y="35.699999999999996" class="val" fill="#041C37">+11,4%</text>
+<text x="104" y="35.199999999999996" class="ytd" text-anchor="end">+2,1</text>
+<line x1="0" x2="104" y1="38.0" y2="38.0" stroke="#C6C7C8" stroke-width="0.25" stroke-dasharray="0.6 0.6"/>
+<text x="0" y="42.3" class="lab">Bond emergenti in euro</text>
+<rect x="40" y="39.0" width="8.99" height="4.8" fill="#041C37"/>
+<text x="50.39" y="43.3" class="val" fill="#041C37">+11,1%</text>
+<text x="104" y="42.8" class="ytd" text-anchor="end">+0,7</text>
+<line x1="0" x2="104" y1="45.6" y2="45.6" stroke="#C6C7C8" stroke-width="0.25" stroke-dasharray="0.6 0.6"/>
+<text x="0" y="49.9" class="lab">Titoli di Stato lunghi</text>
+<rect x="40" y="46.6" width="3.48" height="4.8" fill="#041C37"/>
+<text x="44.88" y="50.9" class="val" fill="#041C37">+4,3%</text>
+<text x="104" y="50.4" class="ytd" text-anchor="end">−1,0</text>
+<line x1="0" x2="104" y1="53.2" y2="53.2" stroke="#C6C7C8" stroke-width="0.25" stroke-dasharray="0.6 0.6"/>
+<text x="0" y="57.49999999999999" class="lab">Bond societari in euro</text>
+<rect x="40" y="54.199999999999996" width="2.83" height="4.8" fill="#041C37"/>
+<text x="44.23" y="58.49999999999999" class="val" fill="#041C37">+3,5%</text>
+<text x="104" y="57.99999999999999" class="ytd" text-anchor="end">+0,5</text>
+<line x1="0" x2="104" y1="60.8" y2="60.8" stroke="#C6C7C8" stroke-width="0.25" stroke-dasharray="0.6 0.6"/>
+<text x="0" y="65.1" class="lab">Titoli di Stato medi</text>
+<rect x="40" y="61.8" width="2.11" height="4.8" fill="#041C37"/>
+<text x="43.51" y="66.1" class="val" fill="#041C37">+2,6%</text>
+<text x="104" y="65.6" class="ytd" text-anchor="end">−0,1</text>
+<line x1="0" x2="104" y1="68.39999999999999" y2="68.39999999999999" stroke="#C6C7C8" stroke-width="0.25" stroke-dasharray="0.6 0.6"/>
+<text x="0" y="72.7" class="lab">Titoli di Stato brevi</text>
+<rect x="40" y="69.39999999999999" width="1.70" height="4.8" fill="#041C37"/>
+<text x="43.10" y="73.7" class="val" fill="#041C37">+2,1%</text>
+<text x="104" y="73.2" class="ytd" text-anchor="end">+0,5</text>
+</svg></div>
+  <div class="abs note" style="left:25mm; top:245mm; width:104mm;">* Dal 1° gennaio al 20 aprile 2026.
+    Portafoglio diversificato: elaborazione Centro Einaudi su dati di fonte varia</div>
+
+  <div class="vline" style="left:136mm; top:137mm; height:124mm;"></div>
+
+  <!-- risparmio gestito -->
+  <div class="abs" style="left:141mm; top:138mm;"><svg width="14mm" height="14mm" viewBox="0 0 100 100">
+      <circle cx="40" cy="26" r="20" fill="#AFA599"/>
+      <path d="M2 92 C2 64 18 52 40 52 C55 52 66 57 72 66 L60 92Z" fill="#AFA599"/>
+      <path d="M78 52 l7 14 15 2 -11 10 3 15 -14 -7 -14 7 3 -15 -11 -10 15 -2z" fill="#AFA599"/></svg></div>
+  <div class="abs h3" style="left:157mm; top:139mm; width:58mm;">Chi possiede<br>risparmio gestito<br>e azioni</div>
+  <div class="abs sub" style="left:141mm; top:163mm; width:70mm;">% di intervistati, ultimi 5 anni (2026).<br>Barre in scala 0-20%</div>
+  <div class="abs" style="left:141mm; top:172mm; width:70mm;"><div class="li">
+          <div class="circ">18,7%</div>
+          <div class="li-body"><div class="li-lab">Fondi comuni e SICAV</div>
+            <div class="track"><div class="fill" style="width:93.5%"></div></div></div>
+        </div>
+<div class="li">
+          <div class="circ">9,9%</div>
+          <div class="li-body"><div class="li-lab">Gestioni patrimoniali</div>
+            <div class="track"><div class="fill" style="width:49.5%"></div></div></div>
+        </div>
+<div class="li">
+          <div class="circ">7,8%</div>
+          <div class="li-body"><div class="li-lab">Azioni (hanno operato direttamente)</div>
+            <div class="track"><div class="fill" style="width:39.0%"></div></div></div>
+        </div>
+<div class="li">
+          <div class="circ">5,3%</div>
+          <div class="li-body"><div class="li-lab">Unit linked</div>
+            <div class="track"><div class="fill" style="width:26.5%"></div></div></div>
+        </div>
+<div class="li">
+          <div class="circ">3,5%</div>
+          <div class="li-body"><div class="li-lab">ETF</div>
+            <div class="track"><div class="fill" style="width:17.5%"></div></div></div>
+        </div></div>
+
+  <div class="abs src" style="left:25mm; top:264mm;">Fonte: Centro Einaudi, dati di fonte varia</div>
+  <div class="abs src" style="left:141mm; top:264mm;">Fonte: Indagine sul Risparmio 2026</div>
+</section>
+<section class="page">
+  <div class="rule" style="left:210.7mm"></div>
+  <div class="vert rubrica" style="left:213.4mm; top:44mm; transform: rotate(-90deg);">L’infografica</div>
+  <div class="vert" style="left:213.4mm; top:166mm; transform: rotate(-90deg);"><b>ADVISOR</b> ottobre 2026</div>
+  <div class="pnum" style="left:213.4mm; top:262mm; transform: rotate(-90deg); transform-origin:left top;">31</div>
+
+  <div class="abs hero" style="left:20mm; top:12mm;">7,8%</div>
+  <div class="abs hlines" style="left:20.6mm; top:52mm; width:84mm;">
+    <span>degli italiani</span><br><span>ha operato in azioni</span><br><span>negli ultimi cinque anni</span></div>
+
+  <!-- conoscenza vs esperienza -->
+  <div class="abs" style="left:20mm; top:99mm; width:82mm;">
+    <div class="kn"><div class="n" style="color:#041C37">45,1%</div>
+      <div class="t">conosce le <b>azioni</b>, più di quanti conoscono le obbligazioni</div></div>
+    <div class="kn"><div class="n" style="color:#E53446">7,8%</div>
+      <div class="t">le ha <b>detenute</b> negli ultimi 5 anni</div></div>
+  </div>
+
+  <!-- pannello blu al posto della foto -->
+  <div class="panel" style="left:108mm; top:0; width:100mm; height:150mm;">
+    <div style="position:absolute; left:6mm; top:12mm; width:90mm;" class="h2">
+      <span style="color:#FFF">La Borsa sale,<br>la soddisfazione segue</span></div>
+    <div style="position:absolute; left:2mm; top:30mm;"><svg width="96mm" height="120mm" viewBox="0 0 96 120">
+<text x="0" y="5" class="pan-h">SODDISFATTI PER OGNI INSODDISFATTO</text>
+<line x1="0" x2="96" y1="52" y2="52" stroke="#2B3F5C" stroke-width="0.3"/>
+<polyline points="2.00,47.67 8.13,45.33 14.27,47.00 20.40,46.00 26.53,42.67 32.67,45.33 38.80,43.33 44.93,33.33 51.07,43.33 57.20,44.00 63.33,35.00 69.47,30.33 75.60,41.00 81.73,17.00 87.87,26.00 94.00,23.67" fill="none" stroke="#FFFFFF" stroke-width="0.9" stroke-linejoin="round"/>
+<circle cx="2.00" cy="47.67" r="0.9" fill="#FFFFFF" stroke="#041C37" stroke-width="0.4"/>
+<text x="2.00" y="52.87" text-anchor="middle" class="pan-v" fill="#FFFFFF">1,3</text>
+<circle cx="8.13" cy="45.33" r="0.9" fill="#FFFFFF" stroke="#041C37" stroke-width="0.4"/>
+<circle cx="14.27" cy="47.00" r="0.9" fill="#FFFFFF" stroke="#041C37" stroke-width="0.4"/>
+<circle cx="20.40" cy="46.00" r="0.9" fill="#FFFFFF" stroke="#041C37" stroke-width="0.4"/>
+<circle cx="26.53" cy="42.67" r="0.9" fill="#FFFFFF" stroke="#041C37" stroke-width="0.4"/>
+<circle cx="32.67" cy="45.33" r="0.9" fill="#FFFFFF" stroke="#041C37" stroke-width="0.4"/>
+<text x="32.67" y="50.53" text-anchor="middle" class="pan-v" fill="#FFFFFF">2,0</text>
+<circle cx="38.80" cy="43.33" r="0.9" fill="#FFFFFF" stroke="#041C37" stroke-width="0.4"/>
+<circle cx="44.93" cy="33.33" r="0.9" fill="#FFFFFF" stroke="#041C37" stroke-width="0.4"/>
+<text x="44.93" y="30.73" text-anchor="middle" class="pan-v" fill="#FFFFFF">5,6</text>
+<circle cx="51.07" cy="43.33" r="0.9" fill="#FFFFFF" stroke="#041C37" stroke-width="0.4"/>
+<circle cx="57.20" cy="44.00" r="0.9" fill="#FFFFFF" stroke="#041C37" stroke-width="0.4"/>
+<circle cx="63.33" cy="35.00" r="0.9" fill="#FFFFFF" stroke="#041C37" stroke-width="0.4"/>
+<circle cx="69.47" cy="30.33" r="0.9" fill="#FFFFFF" stroke="#041C37" stroke-width="0.4"/>
+<text x="69.47" y="27.73" text-anchor="middle" class="pan-v" fill="#FFFFFF">6,5</text>
+<circle cx="75.60" cy="41.00" r="0.9" fill="#FFFFFF" stroke="#041C37" stroke-width="0.4"/>
+<text x="75.60" y="46.20" text-anchor="middle" class="pan-v" fill="#FFFFFF">3,3</text>
+<circle cx="81.73" cy="17.00" r="0.9" fill="#FFFFFF" stroke="#041C37" stroke-width="0.4"/>
+<text x="81.73" y="14.40" text-anchor="middle" class="pan-v" fill="#E53446">10,5</text>
+<circle cx="87.87" cy="26.00" r="0.9" fill="#FFFFFF" stroke="#041C37" stroke-width="0.4"/>
+<circle cx="94.00" cy="23.67" r="0.9" fill="#FFFFFF" stroke="#041C37" stroke-width="0.4"/>
+<text x="95.20" y="21.07" text-anchor="end" class="pan-v" fill="#FFFFFF">8,5</text>
+<text x="0" y="62" class="pan-h">BORSA ITALIANA: RENDIMENTO % DELL’ANNO PRECEDENTE</text>
+<rect x="-0.10" y="88.00" width="4.2" height="7.33" fill="#AFA599"/>
+<text x="2.00" y="86.80" text-anchor="middle" class="pan-b">+10</text>
+<rect x="6.03" y="95.33" width="4.2" height="6.60" fill="#E53446"/>
+<text x="8.13" y="105.13" text-anchor="middle" class="pan-b">−9</text>
+<rect x="12.17" y="85.07" width="4.2" height="10.27" fill="#AFA599"/>
+<text x="14.27" y="83.87" text-anchor="middle" class="pan-b">+14</text>
+<rect x="18.30" y="80.67" width="4.2" height="14.67" fill="#AFA599"/>
+<text x="20.40" y="79.47" text-anchor="middle" class="pan-b">+20</text>
+<rect x="24.43" y="93.87" width="4.2" height="1.47" fill="#AFA599"/>
+<text x="26.53" y="92.67" text-anchor="middle" class="pan-b">+2</text>
+<rect x="30.57" y="95.33" width="4.2" height="2.93" fill="#E53446"/>
+<text x="32.67" y="101.47" text-anchor="middle" class="pan-b">−4</text>
+<rect x="36.70" y="90.93" width="4.2" height="4.40" fill="#AFA599"/>
+<text x="38.80" y="89.73" text-anchor="middle" class="pan-b">+6</text>
+<rect x="42.83" y="88.00" width="4.2" height="7.33" fill="#AFA599"/>
+<text x="44.93" y="86.80" text-anchor="middle" class="pan-b">+10</text>
+<rect x="48.97" y="95.33" width="4.2" height="10.27" fill="#E53446"/>
+<text x="51.07" y="108.80" text-anchor="middle" class="pan-b">−14</text>
+<rect x="55.10" y="74.07" width="4.2" height="21.27" fill="#AFA599"/>
+<text x="57.20" y="72.87" text-anchor="middle" class="pan-b">+29</text>
+<rect x="61.23" y="95.33" width="4.2" height="2.93" fill="#E53446"/>
+<text x="63.33" y="101.47" text-anchor="middle" class="pan-b">−4</text>
+<rect x="67.37" y="78.47" width="4.2" height="16.87" fill="#AFA599"/>
+<text x="69.47" y="77.27" text-anchor="middle" class="pan-b">+23</text>
+<rect x="73.50" y="95.33" width="4.2" height="9.53" fill="#E53446"/>
+<text x="75.60" y="108.07" text-anchor="middle" class="pan-b">−13</text>
+<rect x="79.63" y="74.80" width="4.2" height="20.53" fill="#AFA599"/>
+<text x="81.73" y="73.60" text-anchor="middle" class="pan-b">+28</text>
+<rect x="85.77" y="85.07" width="4.2" height="10.27" fill="#AFA599"/>
+<text x="87.87" y="83.87" text-anchor="middle" class="pan-b">+14</text>
+<rect x="91.90" y="67.47" width="4.2" height="27.87" fill="#AFA599"/>
+<text x="94.00" y="66.27" text-anchor="middle" class="pan-b">+38</text>
+<line x1="0" x2="96" y1="95.33" y2="95.33" stroke="#FFFFFF" stroke-width="0.3"/>
+<text x="2.00" y="118" text-anchor="middle" class="pan-y">’11</text>
+<text x="8.13" y="118" text-anchor="middle" class="pan-y">’12</text>
+<text x="14.27" y="118" text-anchor="middle" class="pan-y">’13</text>
+<text x="20.40" y="118" text-anchor="middle" class="pan-y">’14</text>
+<text x="26.53" y="118" text-anchor="middle" class="pan-y">’15</text>
+<text x="32.67" y="118" text-anchor="middle" class="pan-y">’16</text>
+<text x="38.80" y="118" text-anchor="middle" class="pan-y">’17</text>
+<text x="44.93" y="118" text-anchor="middle" class="pan-y">’18</text>
+<text x="51.07" y="118" text-anchor="middle" class="pan-y">’19</text>
+<text x="57.20" y="118" text-anchor="middle" class="pan-y">’20</text>
+<text x="63.33" y="118" text-anchor="middle" class="pan-y">’21</text>
+<text x="69.47" y="118" text-anchor="middle" class="pan-y">’22</text>
+<text x="75.60" y="118" text-anchor="middle" class="pan-y">’23</text>
+<text x="81.73" y="118" text-anchor="middle" class="pan-y">’24</text>
+<text x="87.87" y="118" text-anchor="middle" class="pan-y">’25</text>
+<text x="94.00" y="118" text-anchor="middle" class="pan-y">’26</text>
+</svg></div>
+  </div>
+
+  <!-- crescita gestito -->
+  <div class="abs" style="left:18mm; top:158mm;"><svg width="16mm" height="16mm" viewBox="0 0 100 100">
+      <polyline points="6,86 34,52 52,68 88,22" fill="none" stroke="#AFA599" stroke-width="10"
+        stroke-linecap="round" stroke-linejoin="round"/>
+      <polyline points="60,18 92,16 90,48" fill="none" stroke="#AFA599" stroke-width="10"
+        stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  <div class="abs h3" style="left:36mm; top:161mm; width:70mm;">La corsa del risparmio<br>gestito (2016-2026)</div>
+  <div class="abs" style="left:24mm; top:185mm; width:84mm;">
+    <div class="cmp-lab"><span class="dot"></span>Possessori di <b>fondi comuni e SICAV</b></div>
+    <div class="cmp">
+      <div><div class="n" style="color:#041C37">6,0%</div><div class="y">2016</div></div>
+      <svg width="20mm" height="8mm" viewBox="0 0 24 8" style="margin:0 3mm 6.5mm"><line x1="0" y1="4" x2="22.5" y2="4" stroke="#041C37" stroke-width="0.6"/><polyline points="18.5,0.6 22.8,4 18.5,7.4" fill="none" stroke="#041C37" stroke-width="0.6"/></svg>
+      <div style="text-align:right"><div class="n" style="color:#E53446">18,7%</div><div class="y" style="color:#E53446">2026</div></div>
+    </div>
+    <div class="dots" style="margin:6mm 0 6mm;"></div>
+    <div class="cmp-lab"><span class="dot"></span>Possessori di <b>unit linked</b></div>
+    <div class="cmp">
+      <div><div class="n" style="color:#041C37">1,9%</div><div class="y">2016</div></div>
+      <svg width="20mm" height="8mm" viewBox="0 0 24 8" style="margin:0 3mm 6.5mm"><line x1="0" y1="4" x2="22.5" y2="4" stroke="#041C37" stroke-width="0.6"/><polyline points="18.5,0.6 22.8,4 18.5,7.4" fill="none" stroke="#041C37" stroke-width="0.6"/></svg>
+      <div style="text-align:right"><div class="n" style="color:#E53446">5,3%</div><div class="y" style="color:#E53446">2026</div></div>
+    </div>
+  </div>
+
+  <div class="vline" style="left:113mm; top:158mm; height:100mm;"></div>
+
+  <!-- chi opera in azioni -->
+  <div class="abs" style="left:117mm; top:157mm;"><svg width="14mm" height="14mm" viewBox="0 0 100 100">
+      <rect x="8" y="56" width="18" height="36" fill="#AFA599"/>
+      <rect x="34" y="36" width="18" height="56" fill="#AFA599"/>
+      <rect x="60" y="14" width="18" height="78" fill="#AFA599"/>
+      <rect x="4" y="92" width="92" height="6" fill="#AFA599"/></svg></div>
+  <div class="abs h3" style="left:133mm; top:160mm; width:76mm;">Chi ha operato<br>in azioni</div>
+  <div class="abs sub" style="left:133mm; top:177mm;">% degli intervistati</div>
+  <div class="abs" style="left:117mm; top:184mm; width:89mm;"><div class="az hl">
+          <div class="az-ic"><svg viewBox="0 0 100 70" width="15mm" height="10.5mm">
+          <circle cx="30" cy="16" r="14" fill="#E53446"/><circle cx="70" cy="16" r="14" fill="#E53446"/>
+          <path d="M2 66 C2 44 14 34 30 34 C46 34 58 44 58 66Z" fill="#E53446"/>
+          <path d="M50 66 C52 46 60 34 70 34 C86 34 98 44 98 66Z" fill="#E53446"/></svg></div>
+          <div class="az-v" style="color:#E53446">4,6%</div>
+          <div class="az-l">Ha operato in azioni negli ultimi 12 mesi (2025)</div></div>
+<div class="az">
+          <div class="az-ic"><svg viewBox="0 0 100 100" width="12mm" height="12mm">
+          <polygon points="4,92 36,30 52,56 70,14 96,92" fill="#041C37"/>
+          <circle cx="70" cy="14" r="9" fill="#FFFFFF" stroke="#041C37" stroke-width="6"/></svg></div>
+          <div class="az-v" style="color:#041C37">12,5%</div>
+          <div class="az-l">Negli ultimi 5 anni: il massimo, nel 2011</div></div>
+<div class="az">
+          <div class="az-ic"><svg viewBox="0 0 100 100" width="12mm" height="12mm">
+          <polyline points="6,10 36,46 56,32 86,76" fill="none" stroke="#041C37" stroke-width="10"/>
+          <polygon points="94,92 66,88 92,62" fill="#041C37"/>
+          <rect x="4" y="92" width="92" height="6" fill="#041C37"/></svg></div>
+          <div class="az-v" style="color:#041C37">5,3%</div>
+          <div class="az-l">Il minimo, nel 2016</div></div>
+<div class="az">
+          <div class="az-ic"><svg viewBox="0 0 100 100" width="12mm" height="12mm">
+          <rect x="6" y="62" width="16" height="32" fill="#041C37"/><rect x="30" y="48" width="16" height="46" fill="#041C37"/>
+          <rect x="54" y="56" width="16" height="38" fill="#041C37"/>
+          <polyline points="6,48 32,24 54,38 88,8" fill="none" stroke="#041C37" stroke-width="9"/>
+          <polygon points="70,4 96,0 92,26" fill="#041C37"/></svg></div>
+          <div class="az-v" style="color:#041C37">10,7%</div>
+          <div class="az-l">Il picco recente, nel 2023</div></div>
+<div class="az">
+          <div class="az-ic"><svg viewBox="0 0 100 100" width="12mm" height="12mm">
+      <circle cx="50" cy="50" r="44" fill="none" stroke="#041C37" stroke-width="10"/>
+      <circle cx="50" cy="50" r="24" fill="none" stroke="#041C37" stroke-width="10"/>
+      <circle cx="50" cy="50" r="8" fill="#041C37"/></svg></div>
+          <div class="az-v" style="color:#041C37">7,8%</div>
+          <div class="az-l">Il dato 2026 (ultimi 5 anni)</div></div></div>
+
+  <div class="abs src" style="left:18mm; top:264mm;">Fonte: Indagine sul Risparmio 2026</div>
+  <div class="abs src" style="left:117mm; top:264mm;">Fonte: Indagine sul Risparmio 2026</div>
+</section></body></html>
