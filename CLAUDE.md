@@ -12,6 +12,9 @@ e dalla presentazione corporate ADVISOR, semplificata per l'uso business.
 Non aggiungere elementi, font o colori che non compaiono qui (niente gradienti, ombre,
 emoji, icone decorative, palette inventate). I valori pronti per l'HTML sono in
 `design/house-style.css`; la pagina `design/prova-stile-advisor.html` mostra tutto applicato.
+Per i documenti Word parti sempre da `design/word/Template ADVISOR.dotx` (stili già
+pronti, logo, intestazione e piè di pagina, font incluso nel file); i file dei font sono
+in `design/fonts/`, gli script per rigenerare il template in `design/word/`.
 
 ### Un solo font: Baskerville
 
