@@ -22,6 +22,9 @@ Titoli delle slide su una sola riga.
 Per i PDF parti sempre da `design/pdf/template-report.html` (copertina, testatina,
 piè di pagina con "Pagina X di Y", tutti gli stili) e convertilo con
 `design/pdf/build-pdf.sh <file.html> <file.pdf>`: A4, font incorporati.
+Le stesse regole, con logo, font e modelli, sono impacchettate nella skill
+`design/skill/stile-advisor/` (pacchetto `stile-advisor.zip` da caricare su claude.ai):
+se cambi lo stile, aggiorna anche la skill e rigenera il pacchetto.
 
 ### Un solo font: Baskerville
 
