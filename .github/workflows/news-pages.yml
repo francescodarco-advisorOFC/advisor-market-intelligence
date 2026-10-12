@@ -1,12 +1,15 @@
 # Aggiorna il Flusso Notizie ADVISOR e lo pubblica su GitHub Pages.
-# Fasce (ora italiana, lun-ven): 8, 10, 12, 15, 17. GitHub ragiona in UTC e non
-# conosce l'ora legale, quindi il cron copre entrambi gli scarti e il primo step
-# lascia proseguire solo le esecuzioni che cadono vicino a una fascia.
+# Fasce (ora italiana, lun-ven) in lib/news/schedule.mjs: 8, 10, 12, 15, 17.
+# I cron di GitHub possono ritardare o saltare: per questo il workflow gira ogni
+# 15 minuti nella fascia lavorativa e pubblica solo quando, dall'ultima fascia
+# iniziata, il sito non è ancora stato aggiornato (scripts/news-due.mjs).
+# Un'esecuzione persa viene così recuperata dalla successiva.
 name: Flusso notizie
 
 on:
   schedule:
-    - cron: '30 5,6,7,8,9,10,12,13,14,15 * * 1-5'
+    # 05-16 UTC copre 7-18 a Roma sia con l'ora solare sia con quella legale.
+    - cron: '7,22,37,52 5-16 * * 1-5'
   workflow_dispatch:
 
 permissions:
@@ -22,30 +25,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      run: ${{ steps.gate.outputs.run }}
+      due: ${{ steps.due.outputs.due }}
     steps:
-      - id: gate
-        name: Controlla la fascia oraria
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then echo "run=true" >> "$GITHUB_OUTPUT"; exit 0; fi
-          now=$(TZ=Europe/Rome date +%H:%M); m=$((10#${now%:*} * 60 + 10#${now#*:}))
-          run=false
-          # Finestra da 30 minuti prima a 40 minuti dopo ogni fascia (i cron di GitHub possono ritardare).
-          for t in 480 600 720 900 1020; do
-            if [ $m -ge $((t - 30)) ] && [ $m -le $((t + 40)) ]; then run=true; fi
-          done
-          echo "Ora di Roma $now -> run=$run"
-          echo "run=$run" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v5
 
-      - if: steps.gate.outputs.run == 'true'
-        uses: actions/checkout@v5
-
-      - if: steps.gate.outputs.run == 'true'
-        uses: actions/setup-node@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
 
-      - if: steps.gate.outputs.run == 'true'
+      - id: due
+        name: Serve un aggiornamento?
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then echo "due=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          owner=$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')
+          node scripts/news-due.mjs "https://${owner}.github.io/${GITHUB_REPOSITORY#*/}/news.json"
+
+      - if: steps.due.outputs.due == 'true'
         name: Scarica le notizie e impagina il sito
         run: |
           node scripts/news-snapshot.mjs _site/news.json
@@ -53,12 +48,12 @@ jobs:
           count=$(node -e "console.log(require('./_site/news.json').items.length)")
           if [ "$count" -lt 20 ]; then echo "::error::Solo $count notizie: pubblicazione annullata"; exit 1; fi
 
-      - if: steps.gate.outputs.run == 'true'
+      - if: steps.due.outputs.due == 'true'
         uses: actions/upload-pages-artifact@v5
 
   deploy:
     needs: build
-    if: needs.build.outputs.run == 'true'
+    if: needs.build.outputs.due == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
