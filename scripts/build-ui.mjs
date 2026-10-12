@@ -4,6 +4,7 @@
 // Senza documento attorno, ui/notizie.html è anche l'artifact che legge news.json.
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
+import { SCHEDULE } from '../lib/news/schedule.mjs';
 
 const root = new URL('..', import.meta.url).pathname;
 const page = await readFile(path.join(root, 'ui/notizie.html'), 'utf8');
@@ -11,10 +12,10 @@ const page = await readFile(path.join(root, 'ui/notizie.html'), 'utf8');
 const i = process.argv.indexOf('--static');
 const staticDir = i > -1 ? process.argv[i + 1] : null;
 
-// Sul sito statico: fasce di aggiornamento (come in .github/workflows/news-pages.yml) e link per lanciarlo a mano.
+// Sul sito statico: fasce di aggiornamento (lib/news/schedule.mjs) e link per lanciarlo a mano.
 const repo = process.env.GITHUB_REPOSITORY || 'francescodarco-advisorOFC/advisor-market-intelligence';
 const staticConfig = {
-  NEWS_SCHEDULE: { days: [1, 2, 3, 4, 5], slots: ['08:00', '10:00', '12:00', '15:00', '17:00'] },
+  NEWS_SCHEDULE: { days: SCHEDULE.days, slots: SCHEDULE.slots },
   NEWS_RUN_URL: `https://github.com/${repo}/actions/workflows/news-pages.yml`,
 };
 const endpoint = staticDir
