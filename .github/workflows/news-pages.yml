@@ -4,6 +4,8 @@
 # 15 minuti nella fascia lavorativa e pubblica solo quando, dall'ultima fascia
 # iniziata, il sito non è ancora stato aggiornato (scripts/news-due.mjs).
 # Un'esecuzione persa viene così recuperata dalla successiva.
+# Se lo scheduler di GitHub non parte, un servizio esterno (es. cron-job.org) può
+# lanciare il workflow via API con force=false: anche lui pubblica solo se serve.
 name: Flusso notizie
 
 on:
@@ -11,6 +13,11 @@ on:
     # 05-16 UTC copre 7-18 a Roma sia con l'ora solare sia con quella legale.
     - cron: '7,22,37,52 5-16 * * 1-5'
   workflow_dispatch:
+    inputs:
+      force:
+        description: 'Pubblica anche se il sito è già aggiornato'
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -36,7 +43,7 @@ jobs:
       - id: due
         name: Serve un aggiornamento?
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then echo "due=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force }}" != "false" ]; then echo "due=true" >> "$GITHUB_OUTPUT"; exit 0; fi
           owner=$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')
           node scripts/news-due.mjs "https://${owner}.github.io/${GITHUB_REPOSITORY#*/}/news.json"
 
