@@ -11,7 +11,15 @@ const page = await readFile(path.join(root, 'ui/notizie.html'), 'utf8');
 const i = process.argv.indexOf('--static');
 const staticDir = i > -1 ? process.argv[i + 1] : null;
 
-const endpoint = staticDir ? '' : `<script>window.NEWS_ENDPOINT = '/api/news';</script>\n`;
+// Sul sito statico: fasce di aggiornamento (come in .github/workflows/news-pages.yml) e link per lanciarlo a mano.
+const repo = process.env.GITHUB_REPOSITORY || 'francescodarco-advisorOFC/advisor-market-intelligence';
+const staticConfig = {
+  NEWS_SCHEDULE: { days: [1, 2, 3, 4, 5], slots: ['08:00', '10:00', '12:00', '15:00', '17:00'] },
+  NEWS_RUN_URL: `https://github.com/${repo}/actions/workflows/news-pages.yml`,
+};
+const endpoint = staticDir
+  ? `<script>${Object.entries(staticConfig).map(([k, v]) => `window.${k} = ${JSON.stringify(v)};`).join(' ')}</script>\n`
+  : `<script>window.NEWS_ENDPOINT = '/api/news';</script>\n`;
 const html = `<!doctype html>
 <html lang="it">
 <head>
