@@ -2,9 +2,12 @@
   "name": "advisor-market-intelligence",
   "version": "1.0.0",
   "scripts": {
+    "predev": "node scripts/build-ui.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/build-ui.mjs",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "news:snapshot": "node scripts/news-snapshot.mjs"
   },
   "dependencies": {
     "next": "latest",
