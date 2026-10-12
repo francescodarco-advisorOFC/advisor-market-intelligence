@@ -154,6 +154,10 @@ button, input { font: inherit; color: inherit; }
         <h2>Testate specializzate <button type="button" data-toggle="testata">tutte / nessuna</button></h2>
         <div class="list" id="src-testata"></div>
       </section>
+      <section>
+        <h2>Quotidiani internazionali <button type="button" data-toggle="estero">tutti / nessuno</button></h2>
+        <div class="list" id="src-estero"></div>
+      </section>
     </aside>
 
     <main>
@@ -162,7 +166,7 @@ button, input { font: inherit; color: inherit; }
       <div class="box">
         <h4>Nota di metodo</h4>
         <p>Le notizie arrivano dai feed RSS ufficiali delle testate. Per le fonti che non ne pubblicano uno, o lo bloccano, arrivano da Google News filtrato per sito: in quel caso il link passa da Google News.</p>
-        <p>Reuters e Bloomberg sono in inglese. Radiocor arriva tramite Il Sole 24 Ore, MF Newswires tramite Milano Finanza. Dow Jones Newswires è riservata agli abbonati e non è inclusa.</p>
+        <p>Reuters, Bloomberg, Financial Times e Wall Street Journal sono in inglese; gli articoli di FT e WSJ sono in gran parte riservati agli abbonati. Radiocor arriva tramite Il Sole 24 Ore, MF Newswires tramite Milano Finanza. Dow Jones Newswires è riservata agli abbonati e non è inclusa.</p>
       </div>
     </main>
   </div>
@@ -177,6 +181,7 @@ button, input { font: inherit; color: inherit; }
   const SCHEDULE = window.NEWS_SCHEDULE || null; // { days: [1..5], slots: ['08:00', ...] }, ora di Roma
   const RUN_URL = window.NEWS_RUN_URL || '';
   const BTN_LABEL = LIVE ? 'Aggiorna' : 'Ricarica';
+  const GROUP_LABEL = { agenzia: 'agenzia', testata: 'testata specializzata', estero: 'quotidiano internazionale' };
   $('refresh-label').textContent = BTN_LABEL;
   if (RUN_URL) { $('runlink').href = RUN_URL; $('runlink').hidden = false; }
   const PAGE = 120;
@@ -250,7 +255,7 @@ button, input { font: inherit; color: inherit; }
   function buildSide() {
     const counts = {};
     windowed().forEach((i) => { counts[i.source] = (counts[i.source] || 0) + 1; });
-    for (const group of ['agenzia', 'testata']) {
+    for (const group of ['agenzia', 'testata', 'estero']) {
       const box = $('src-' + group); box.textContent = '';
       data.sources.filter((s) => s.group === group).forEach((s) => {
         const input = el('input', { type: 'checkbox', id: 'src-' + s.id });
@@ -369,7 +374,7 @@ button, input { font: inherit; color: inherit; }
       const h = fmtDayShort.format(d) + ' · ore ' + fmtHH.format(d) + ':00';
       if (h !== lastHour) { lastHour = h; feed.append(el('div', { class: 'hour', text: h })); }
       const s = src[i.source];
-      const meta = el('div', { class: 'meta' }, el('span', { class: 'src', text: s.name }), el('span', { class: 'grp', text: s.group === 'agenzia' ? 'agenzia' : 'testata specializzata' }));
+      const meta = el('div', { class: 'meta' }, el('span', { class: 'src', text: s.name }), el('span', { class: 'grp', text: GROUP_LABEL[s.group] || '' }));
       if (s.lang !== 'it') meta.append(el('span', { class: 'lang', text: s.lang.toUpperCase() }));
       const body = el('div', {}, meta, el('a', { class: 'title', href: i.link, target: '_blank', rel: 'noopener', text: i.title }));
       if (i.summary && i.summary !== i.title) body.append(el('p', { class: 'sum', text: i.summary }));
