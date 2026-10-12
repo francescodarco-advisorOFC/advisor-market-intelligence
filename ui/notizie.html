@@ -46,6 +46,9 @@ button, input { font: inherit; color: inherit; }
 .seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); font-weight: 700; }
 .status { font-style: italic; color: var(--grey); font-size: 13px; margin-left: auto; }
 .status.warn { color: var(--red); }
+.status .next { display: block; }
+.runlink { font-size: 12px; color: var(--grey); }
+.runlink:hover { color: var(--red); }
 
 /* Corpo */
 .layout { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 40px; padding-top: 24px; }
@@ -124,7 +127,8 @@ button, input { font: inherit; color: inherit; }
       <button type="button" data-h="12">12 ore</button>
       <button type="button" data-h="24" aria-pressed="true">24 ore</button>
     </div>
-    <span class="status" id="status">Caricamento delle fonti…</span>
+    <span class="status" id="status-box"><span id="status">Caricamento delle fonti…</span><span class="next" id="next" hidden></span></span>
+    <a class="runlink" id="runlink" target="_blank" rel="noopener" hidden>Aggiorna ora (GitHub)</a>
   </div>
 
   <details class="mobile-filters" id="mf"><summary>Filtri: fonti e temi</summary></details>
@@ -166,10 +170,16 @@ button, input { font: inherit; color: inherit; }
 
 <script>
 (() => {
+  const $ = (id) => document.getElementById(id);
   const ENDPOINT = window.NEWS_ENDPOINT || 'news.json';
   const LIVE = !!window.NEWS_ENDPOINT;
+  // Sul sito statico (GitHub Pages) il build indica le fasce di aggiornamento e il link per lanciarlo a mano.
+  const SCHEDULE = window.NEWS_SCHEDULE || null; // { days: [1..5], slots: ['08:00', ...] }, ora di Roma
+  const RUN_URL = window.NEWS_RUN_URL || '';
+  const BTN_LABEL = LIVE ? 'Aggiorna' : 'Ricarica';
+  $('refresh-label').textContent = BTN_LABEL;
+  if (RUN_URL) { $('runlink').href = RUN_URL; $('runlink').hidden = false; }
   const PAGE = 120;
-  const $ = (id) => document.getElementById(id);
 
   const store = {
     get(k, d) { try { const v = localStorage.getItem('advnews:' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
@@ -210,7 +220,7 @@ button, input { font: inherit; color: inherit; }
 
   async function load(manual) {
     const btn = $('refresh');
-    btn.disabled = true; $('refresh-label').textContent = 'Aggiornamento…';
+    btn.disabled = true; $('refresh-label').textContent = LIVE ? 'Aggiornamento…' : 'Ricarico…';
     try {
       // Nella versione web il click su Aggiorna rilegge i feed saltando la cache del server.
       const url = ENDPOINT + (ENDPOINT.includes('?') ? '&' : '?') + (LIVE && manual ? 'fresh=1&' : '') + 't=' + Date.now();
@@ -223,10 +233,10 @@ button, input { font: inherit; color: inherit; }
       buildSide();
       render();
     } catch (e) {
-      $('status').textContent = 'Le notizie non si sono caricate (' + e.message + '). Riprova con Aggiorna.';
-      $('status').className = 'status warn';
+      $('status').textContent = 'Le notizie non si sono caricate (' + e.message + '). Riprova con ' + BTN_LABEL + '.';
+      $('status-box').className = 'status warn';
     } finally {
-      btn.disabled = false; $('refresh-label').textContent = 'Aggiorna';
+      btn.disabled = false; $('refresh-label').textContent = BTN_LABEL;
     }
   }
 
@@ -277,13 +287,58 @@ button, input { font: inherit; color: inherit; }
     });
   }
 
+  // Ora di Roma come { wd: 1 (lun) … 7 (dom), min: minuti dalla mezzanotte }.
+  const romeParts = new Intl.DateTimeFormat('en-GB', { weekday: 'short', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZone: 'Europe/Rome' });
+  const WD = { Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6, Sun: 7 };
+  const DAY_NAMES = ['', 'lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato', 'domenica'];
+  function romeNow() {
+    const p = Object.fromEntries(romeParts.formatToParts(new Date()).map((x) => [x.type, x.value]));
+    return { wd: WD[p.weekday], min: Number(p.hour) * 60 + Number(p.minute) };
+  }
+  const slotMins = () => SCHEDULE.slots.map((t) => { const [h, m] = t.split(':').map(Number); return h * 60 + m; }).sort((a, b) => a - b);
+
+  // Prossima fascia: { days: giorni da oggi, min }.
+  function nextSlot() {
+    const now = romeNow(); const slots = slotMins();
+    for (let d = 0; d <= 7; d++) {
+      const wd = ((now.wd - 1 + d) % 7) + 1;
+      if (!SCHEDULE.days.includes(wd)) continue;
+      const s = slots.find((m) => d > 0 || m > now.min);
+      if (s != null) return { days: d, wd, min: s };
+    }
+    return null;
+  }
+  // Minuti trascorsi dall'ultima fascia passata.
+  function sinceLastSlot() {
+    const now = romeNow(); const slots = slotMins();
+    for (let d = 0; d <= 7; d++) {
+      const wd = ((now.wd - 1 - d + 70) % 7) + 1;
+      if (!SCHEDULE.days.includes(wd)) continue;
+      const past = slots.filter((m) => d > 0 || m <= now.min);
+      if (past.length) return d * 1440 + now.min - past[past.length - 1];
+    }
+    return null;
+  }
+  const hhmm = (m) => Math.floor(m / 60) + ':' + String(m % 60).padStart(2, '0');
+
   function updateStatus() {
     if (!data) return;
     const gen = new Date(data.generatedAt);
     const ageMin = Math.round((Date.now() - gen) / 60000);
-    const st = $('status');
-    st.textContent = 'Aggiornato alle ' + fmtTime.format(gen) + (ageMin >= 1 ? ' (' + (ageMin < 120 ? ageMin + ' min fa' : Math.round(ageMin / 60) + ' ore fa') + ')' : '');
-    st.className = 'status' + (ageMin > 180 ? ' warn' : '');
+    $('status').textContent = 'Aggiornato alle ' + fmtTime.format(gen) + (ageMin >= 1 ? ' (' + (ageMin < 120 ? ageMin + ' min fa' : Math.round(ageMin / 60) + ' ore fa') + ')' : '');
+    let late = ageMin > 180;
+    if (SCHEDULE) {
+      // In rosso solo se è saltata una fascia: i dati della sera prima, al mattino presto, sono normali.
+      const since = sinceLastSlot();
+      late = since != null && since > 60 && ageMin > since + 30;
+      const n = nextSlot();
+      if (n) {
+        const when = n.days === 0 ? 'oggi' : n.days === 1 ? 'domani' : DAY_NAMES[n.wd];
+        $('next').textContent = 'Prossimo aggiornamento ' + when + ' alle ' + hhmm(n.min);
+        $('next').hidden = false;
+      }
+    }
+    $('status-box').className = 'status' + (late ? ' warn' : '');
   }
 
   function render() {
